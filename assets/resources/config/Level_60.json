@@ -1,0 +1,263 @@
+{
+    "Level": 60,
+    "Difficulty": "Very Hard",
+    "Box": 12,
+    "Dish": 49,
+    "Time": 310,
+    "OrderMilestone": [
+        15,
+        35
+    ],
+    "OrderConfig": [
+        "1_1",
+        "0_s1_0"
+    ],
+    "BoxData": [
+        {
+            "BoxID": "Box_1",
+            "BoxType": "Ads",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "0_0_0"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_2",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "1_0_2",
+                "0_12_12",
+                "24_0_19",
+                "25_32_0",
+                "0_27_0",
+                "36_35_47",
+                "40_38_48"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Freeze_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_3",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "3_0_0",
+                "13_7_0",
+                "18_0_18",
+                "25_33_33",
+                "40_28_41",
+                "22_41_0",
+                "47_38_0"
+            ],
+            "ItemType": [
+                "Freeze_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Freeze_Normal_Freeze",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_4",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "3_0_4",
+                "13_13_14",
+                "11_20_25",
+                "34_34_0",
+                "16_10_30",
+                "30_36_44",
+                "0_49_49"
+            ],
+            "ItemType": [
+                "Freeze_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Freeze_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Freeze_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_5",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "5_6_6",
+                "15_7_15",
+                "26_26_0",
+                "0_35_34",
+                "41_0_42",
+                "0_48_39"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Freeze",
+                "Normal_Normal_Normal",
+                "Normal_Freeze_Normal",
+                "Freeze_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_6",
+            "BoxType": "Takeout",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "0_4_0",
+                "16_17_0",
+                "27_28_0",
+                "21_21_0",
+                "0_43_44"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Freeze_Normal",
+                "Normal_Normal_Normal",
+                "Freeze_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_7",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "7_8_8",
+                "0_18_14",
+                "24_20_24",
+                "36_0_17",
+                "0_45_31",
+                "0_44_0"
+            ],
+            "ItemType": [
+                "Normal_Normal_Freeze",
+                "Normal_Normal_Normal",
+                "Freeze_Freeze_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_8",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "0_4_9",
+                "12_19_0",
+                "26_22_29",
+                "37_0_37",
+                "0_46_43",
+                "0_47_45"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Freeze_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_9",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "0_2_0",
+                "1_20_1",
+                "15_17_0",
+                "0_33_16",
+                "31_45_0",
+                "49_0_39"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Freeze_Normal_Normal",
+                "Normal_Freeze_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_10",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "10_11_10",
+                "21_22_0",
+                "30_31_0",
+                "38_39_0",
+                "28_27_0"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Freeze_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_11",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "9_0_9",
+                "6_23_23",
+                "14_8_0",
+                "32_32_0",
+                "0_29_29",
+                "0_35_0",
+                "48_42_0"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Freeze",
+                "Freeze_Normal_Normal",
+                "Normal_Freeze_Normal",
+                "Normal_Freeze_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_12",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "0_3_0",
+                "23_2_0",
+                "19_5_5",
+                "11_0_37",
+                "0_43_46",
+                "40_46_42"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Freeze_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Freeze",
+                "Normal_Normal_Normal"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,173 @@
+{
+    "Level": 49,
+    "Difficulty": "Normal",
+    "Box": 9,
+    "Dish": 36,
+    "Time": 210,
+    "OrderMilestone": [
+    ],
+    "OrderConfig": [
+        ""
+    ],
+    "BoxData": [
+        {
+            "BoxID": "Box_1",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "1_2_2",
+                "10_11_11",
+                "17_18_19",
+                "5_0_5"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Freeze_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Freeze"
+            ]
+        },
+        {
+            "BoxID": "Box_2",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "4_4_5",
+                "12_0_12",
+                "17_0_17",
+                "23_24_21"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Wrap_Normal_Normal",
+                "Normal_Normal_Freeze",
+                "Normal_Wrap_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_3",
+            "BoxType": "Hidden",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "1_3_3",
+                "0_13_14",
+                "22_0_21",
+                "0_12_0"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Wrap_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_4",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "x2",
+            "ItemData": [
+                "3_6_5",
+                "15_15_0",
+                "7_19_19",
+                "14_23_21"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Wrap_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_5",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "7_0_6",
+                "0_11_0",
+                "15_15_0",
+                "5_15_0"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Wrap_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_6",
+            "BoxType": "Hidden",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "8_0_7",
+                "0_10_0",
+                "7_0_20",
+                "0_17_14"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Wrap_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Wrap"
+            ]
+        },
+        {
+            "BoxID": "Box_7",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "9_3_0",
+                "13_2_0",
+                "21_0_12",
+                "4_5_5"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Freeze",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_8",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "0_4_8",
+                "0_15_16",
+                "18_0_7",
+                "14_0_17"
+            ],
+            "ItemType": [
+                "Normal_Freeze_Normal",
+                "Normal_Normal_Normal",
+                "Freeze_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_9",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "0_7_9",
+                "0_3_3",
+                "7_7_22",
+                "21_24_24"
+            ],
+            "ItemType": [
+                "Normal_Freeze_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Wrap_Normal"
+            ]
+        }
+    ],
+    "ConveyorData": [
+        {
+            "RowID": 4,
+            "itemIDs": "5_9_6_14_18_13_21_25_25_10_12_16_16_12_17_20_1_7_14_5_4_22_23_4_8_25_20"
+        }
+    ]
+}

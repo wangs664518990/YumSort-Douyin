@@ -1,0 +1,240 @@
+{
+    "Level": 15,
+    "Difficulty": "Hard",
+    "Box": 12,
+    "Dish": 40,
+    "Time": 280,
+    "OrderMilestone": [
+        10,
+        24,
+        34
+    ],
+    "OrderConfig": [
+        "0_1",
+        "2_1",
+        "1_1"
+    ],
+    "BoxData": [
+        {
+            "BoxID": "Box_1",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "1_2_1",
+                "14_14_0",
+                "23_7_0",
+                "28_0_32",
+                "33_10_0"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Wrap_Wrap_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Wrap",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_2",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "1_2_2",
+                "0_0_11",
+                "0_19_3",
+                "28_5_0",
+                "26_0_10"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Wrap",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_3",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "3_3_0",
+                "15_16_0",
+                "14_0_0",
+                "0_17_17",
+                "0_18_0"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_4",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "4_5_6",
+                "10_10_19",
+                "28_0_11",
+                "20_0_30",
+                "14_0_34"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_5",
+            "BoxType": "Hidden",
+            "BoxTypeConfig": "x2",
+            "ItemData": [
+                "6_7_0",
+                "20_21_22",
+                "5_11_14",
+                "3_15_0",
+                "33_0_18"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Wrap_Normal",
+                "Normal_Normal_Wrap"
+            ]
+        },
+        {
+            "BoxID": "Box_6",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "8_4_0",
+                "16_16_17",
+                "3_0_29",
+                "0_31_31",
+                "10_0_0"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Wrap",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_7",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "3_9_9",
+                "18_23_0",
+                "0_30_24",
+                "23_32_0",
+                "20_0_11"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Wrap",
+                "Normal_Normal_Normal",
+                "Wrap_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_8",
+            "BoxType": "Ads",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "0_0_0"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_9",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "0_8_8",
+                "24_24_25",
+                "26_13_7",
+                "19_25_0",
+                "34_0_34"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Wrap_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_10",
+            "BoxType": "Normal",
+            "BoxTypeConfig": "",
+            "ItemData": [
+                "5_5_0",
+                "0_0_9",
+                "13_26_26",
+                "21_21_0",
+                "0_30_29"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Wrap",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_11",
+            "BoxType": "Hidden",
+            "BoxTypeConfig": "x8",
+            "ItemData": [
+                "10_0_11",
+                "26_26_25",
+                "4_0_31",
+                "6_0_14",
+                "22_5_33"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Wrap",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_12",
+            "BoxType": "Hidden",
+            "BoxTypeConfig": "x5",
+            "ItemData": [
+                "6_0_13",
+                "22_27_27",
+                "0_32_29",
+                "15_6_6",
+                "11_0_27"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Wrap",
+                "Normal_Normal_Normal",
+                "Normal_Wrap_Wrap",
+                "Normal_Normal_Normal",
+                "Normal_Normal_Wrap"
+            ]
+        }
+    ]
+}

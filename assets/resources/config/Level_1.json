@@ -1,0 +1,73 @@
+{
+    "Level": 1,
+    "Difficulty": "Normal",
+    "Box": 6,
+    "Dish": 5,
+    "Time": 300,
+    "BoxData": [
+        {
+            "BoxID": "Box_4",
+            "BoxType": "Normal",
+            "ItemData": [
+                "1_0_2"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_5",
+            "BoxType": "Normal",
+            "ItemData": [
+                "2_0_4"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_6",
+            "BoxType": "Normal",
+            "ItemData": [
+                "4_0_4"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_7",
+            "BoxType": "Normal",
+            "ItemData": [
+                "1_0_1"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_8",
+            "BoxType": "Normal",
+            "ItemData": [
+                "3_0_3",
+                "5_0_5"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        },
+        {
+            "BoxID": "Box_9",
+            "BoxType": "Normal",
+            "ItemData": [
+                "3_0_0",
+                "2_0_5"
+            ],
+            "ItemType": [
+                "Normal_Normal_Normal",
+                "Normal_Normal_Normal"
+            ]
+        }
+    ]
+}

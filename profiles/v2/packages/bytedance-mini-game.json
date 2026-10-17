@@ -1,0 +1,66 @@
+{
+  "__version__": "1.0.3",
+  "builder": {
+    "common": {
+      "binGroupConfig": {
+        "threshold": 16,
+        "enable": false
+      },
+      "buildPath": "project://build",
+      "outputName": "bytedance-mini-game",
+      "mainBundleCompressionType": "subpackage",
+      "platform": "bytedance-mini-game",
+      "mainBundleIsRemote": false,
+      "startSceneAssetBundle": true,
+      "nativeCodeBundleMode": "wasm",
+      "overwriteProjectSettings": {
+        "macroConfig": {
+          "cleanupImageCache": "on"
+        },
+        "includeModules": {
+          "gfx-webgl2": "off"
+        }
+      },
+      "wasmCompressionMode": "brotli"
+    },
+    "options": {
+      "bytedance-mini-game": {
+        "buildOpenDataContextTemplate": "",
+        "appid": "ttaa87dc3a34e1470002",
+        "orientation": "portrait",
+        "physX": {
+          "use": "project",
+          "notPackPhysXLibs": false,
+          "multiThread": false,
+          "subThreadCount": 1,
+          "epsilon": 0.001
+        },
+        "devToolsLaunchMethod": "full",
+        "separateEngine": true,
+        "__version__": "1.0.3",
+        "wasmSubpackage": true,
+        "generatePreloadJsFileList": true
+      }
+    },
+    "taskOptionsMap": {
+      "1784789683460": {
+        "buildOpenDataContextTemplate": "",
+        "appid": "ttaa87dc3a34e1470002",
+        "orientation": "portrait",
+        "physX": {
+          "use": "project",
+          "notPackPhysXLibs": false,
+          "multiThread": false,
+          "subThreadCount": 1,
+          "epsilon": 0.001
+        },
+        "devToolsLaunchMethod": "full",
+        "separateEngine": true,
+        "__version__": "1.0.3",
+        "wasmSubpackage": true,
+        "generatePreloadJsFileList": true
+      }
+    },
+    "__version__": "1.3.9"
+  }
+}
