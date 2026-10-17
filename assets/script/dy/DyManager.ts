@@ -13,10 +13,10 @@ export class SdkManager {
     }
 
     // 激励视频
-    videoId: string = '1ogultp723s1rsr364'
+    videoId: string = '1533aeej4hkk6a8jh5'
     private videoAd = null
     // 插屏
-    interstitialId: string = '2dmo642nln8c9ip4ll'
+    interstitialId: string = '44d5a8ll12km6brkeb'
     private interstitialAd = null
     // 横幅
     bannerId: string = ''
