@@ -6,6 +6,7 @@ import { DSBaseView } from '../framework/DSBaseView';
 import { App } from '../framework/DSAppManager';
 import { DSViewName } from '../framework/DSUiManager';
 import { SdkManager } from '../dy/DyManager';
+import { KsManager } from '../ks/KsManager';
 import { DSEventKey } from '../framework/DSEventManager';
 
 @ccclass('homeView')
@@ -36,7 +37,13 @@ export class homeView extends DSBaseView {
         this.evtUpdateLife();
 
         WxMgr.showGameQuan();
-        Advertise.showInterstitialAds();
+        if (KsManager.isKuaishouEnv()) {
+            // 快手:冷启动位展示开屏广告(仅3天以上老用户),代替普通启动插屏,避免双弹
+            Advertise.showSplashAds();
+        } else {
+            // 其他平台维持原启动插屏
+            Advertise.showInterstitialAds();
+        }
         Advertise.showBannerAds();
         Advertise.showCoustomAd();
         SdkManager.instance.showCustomAdsOne();

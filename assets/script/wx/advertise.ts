@@ -1,5 +1,6 @@
 import { sys } from "cc";
 import { SdkManager } from "../dy/DyManager";
+import { KsManager } from "../ks/KsManager";
 import { App } from "../framework/DSAppManager";
 
 export class Ads {
@@ -21,8 +22,12 @@ export class Ads {
 
     init() {
         if(this.isTest)return;
-        // @ts-ignore
-        if (typeof ks != 'undefined') return;
+        if (KsManager.isKuaishouEnv()) {
+            // 快手环境:广告走 ks.* 接口(详见 KsManager)
+            console.log('--------------init ks ads-----------------');
+            KsManager.instance.initAds();
+            return;
+        }
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
         console.log('--------------init ads-----------------');
         // @ts-ignore
@@ -84,7 +89,7 @@ export class Ads {
 
     createVideoAds() {
         //@ts-ignore
-        if (typeof ks != 'undefined') return;
+        if (KsManager.isKuaishouEnv()) return;
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
         console.log('--------------init ads-----------------');
 
@@ -103,8 +108,11 @@ export class Ads {
     /** 显示格子广告 */
     showCoustomAd() {
         if(this.isTest)return;
-        // @ts-ignore
-        if (typeof ks != 'undefined') return;
+        if (KsManager.isKuaishouEnv()) {
+            // 快手暂不支持原生模板/格子广告
+            console.log('[Ads] 快手平台不支持格子广告');
+            return;
+        }
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
 
         this.customAd && this.customAd.show();
@@ -113,17 +121,18 @@ export class Ads {
     /** 隐藏格子广告 */
     hideCoustomAd() {
         if(this.isTest)return;
+        if (KsManager.isKuaishouEnv()) return;
         this.customAd && this.customAd.hide();
-        // @ts-ignore
-        if (typeof ks != 'undefined') return;
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
     }
 
     //显示banner广告
     showBannerAds() {
         if(this.isTest)return;
-        // @ts-ignore
-        if (typeof ks != 'undefined') return;
+        if (KsManager.isKuaishouEnv()) {
+            KsManager.instance.showBannerAds();
+            return;
+        }
         SdkManager.instance.initBannerAd();
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
         // 在适合的场景显示 Banner 广告
@@ -134,15 +143,17 @@ export class Ads {
     // 隐藏banner广告
     hideBannerAds() {
         if(this.isTest)return;
-        // @ts-ignore
-        if (typeof ks != 'undefined') return;
+        if (KsManager.isKuaishouEnv()) {
+            KsManager.instance.hideBannerAds();
+            return;
+        }
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
         // @ts-ignore
         this.bannerAdv.hide();
     }
 
     //显示视频广告
-    showVideoAds(success:Function) {
+    showVideoAds(success:Function, fail?:Function) {
         if(this.isTest){
             success && success();
             return;
@@ -151,9 +162,10 @@ export class Ads {
             success && success();
             return;
         }
-        // ksAdvertise.showVideoAds(success);
-        // // @ts-ignore
-        // if (typeof ks != 'undefined') return;
+        if (KsManager.isKuaishouEnv()) {
+            KsManager.instance.showVideoAds(success, fail);
+            return;
+        }
         SdkManager.instance.initVideoAd();
         SdkManager.instance.showVideoAd(success);
         if (sys.platform != sys.Platform.WECHAT_GAME) {
@@ -201,9 +213,10 @@ export class Ads {
     // 显示插件广告
     showInterstitialAds() {
         if(this.isTest)return;
-        // ksAdvertise.showInterstitialAds();
-        // @ts-ignore
-        if (typeof ks != 'undefined') return;
+        if (KsManager.isKuaishouEnv()) {
+            KsManager.instance.showInterstitialAds();
+            return;
+        }
         SdkManager.instance.initInterstitialAd();
         SdkManager.instance.showInterstitialAd();
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
@@ -216,6 +229,20 @@ export class Ads {
             })
         }
 
+    }
+
+    /**
+     * 显示开屏广告
+     * 仅快手平台、仅首次游玩满 3 天的老用户、每次冷启动最多一次(规则在 KsManager 内实现);
+     * 其他平台不展示开屏广告。
+     */
+    showSplashAds() {
+        if(this.isTest)return;
+        if (KsManager.isKuaishouEnv()) {
+            KsManager.instance.showSplashAds();
+            return;
+        }
+        // 非快手平台无开屏广告
     }
 }
 

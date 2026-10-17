@@ -14,6 +14,8 @@ export enum DSStorageKey {
     Music_Status = 'Music_Status',
     Life = 'Life',
     CurTimeCount = 'CurTimeCount',
+    /** 首次游玩时间戳(用于老用户判断,如开屏广告仅3天以上用户可见) */
+    First_Play_Time = 'First_Play_Time',
 }
 
 /**
@@ -36,9 +38,18 @@ export class DSStorageManager {
 
     init(){
         if(this.get(DSStorageKey.Init)){
+            // 已初始化过,仅需兜底记录首次游玩时间(防止旧版本升级上来时缺失)
+            if(!this.has(DSStorageKey.First_Play_Time)){
+                this.set(DSStorageKey.First_Play_Time, Date.now());
+            }
             return;
         }
         this.set(DSStorageKey.Init, true);
+
+        // 记录首次游玩时间,仅首次写入,之后不再更新
+        if(!this.has(DSStorageKey.First_Play_Time)){
+            this.set(DSStorageKey.First_Play_Time, Date.now());
+        }
 
         if(!this.get(DSStorageKey.Level)){
             this.set(DSStorageKey.Level, 1);

@@ -4,6 +4,7 @@
 import { _decorator, sys } from 'cc';
 import { App } from '../framework/DSAppManager';
 import { DSStorageKey } from '../framework/DSStorageManager';
+import { KsManager } from '../ks/KsManager';
 export var IsGetInfo = false;
 export class WxManager {
     private wxCode = '';
@@ -15,6 +16,8 @@ export class WxManager {
      * 登录接口
      */
     _wxLogin() {
+        // 快手环境(sys.platform 仍为 WECHAT_GAME,但无微信登录链路)不走微信登录
+        if (KsManager.isKuaishouEnv()) return;
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
         console.log('start_login');
         let self = this;
@@ -276,16 +279,16 @@ export class WxManager {
 
     // 在适当的时机调用该函数来触发设备的震动
     public vibrate(isLong: boolean = true) {
-        // @ts-ignore
-        if (typeof ks != 'undefined') return;
-        if (sys.platform != sys.Platform.WECHAT_GAME && sys.platform != sys.Platform.BYTEDANCE_MINI_GAME) {
+        let bool = App.storage.getBoolean(DSStorageKey.Zhen_Dong_Status,true);
+        if (!bool) return;
+        if (KsManager.isKuaishouEnv()) {
+            // 快手环境使用 ks.vibrateShort/vibrateLong
+            KsManager.instance.vibrate(isLong);
             return;
         }
         if (sys.platform != sys.Platform.WECHAT_GAME) {
             return;
         }
-        let bool = App.storage.getBoolean(DSStorageKey.Zhen_Dong_Status,true);
-        if (!bool) return;
         if(isLong){
             // @ts-ignore
             if (wx.vibrateLong) {
@@ -324,6 +327,8 @@ export class WxManager {
     private gamequan: null;
     /** 创建游戏圈 */
     showGameQuan() {
+        // 快手环境无微信游戏圈
+        if (KsManager.isKuaishouEnv()) return;
         if (sys.platform != sys.Platform.WECHAT_GAME) {
             return;
         }
