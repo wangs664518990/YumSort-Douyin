@@ -1,0 +1,82 @@
+{
+  "__version__": "1.0.0",
+  "builder": {
+    "taskOptionsMap": {
+      "1792302540702": {
+        "versionName": "0.0.1",
+        "privatePemPath": "",
+        "deviceOrientation": "portrait",
+        "networkTimeout": {
+          "XMLHttpRequest": "6000",
+          "Websocket": "6000",
+          "uploadFile": "6000",
+          "downloadFile": "6000"
+        },
+        "package": "com.sud.cocos",
+        "minPlatformVersion": "2.0.0",
+        "versionCode": "1",
+        "runtimeVersion": "1056",
+        "minRuntimeVersion": "2.0.0",
+        "encryptKey": "00112233445566778899aabbccddeeff",
+        "workers": "",
+        "context": {},
+        "context_signature": "",
+        "context_signature_version": "",
+        "context_ordered_json": "",
+        "public_key": "",
+        "permissions": [],
+        "fullScreen": true,
+        "backgroundColor": "#000000",
+        "appkey": "",
+        "uploadEnv": "prod",
+        "accessToken": "",
+        "codeVersion": "",
+        "package_id": "",
+        "useDebugKey": false,
+        "autoBuildWithOtherPlatforms": true,
+        "__version__": "1.0.0"
+      },
+      "1792308240301": {
+        "versionName": "0.0.1",
+        "privatePemPath": "",
+        "deviceOrientation": "portrait",
+        "networkTimeout": {
+          "XMLHttpRequest": "6000",
+          "Websocket": "6000",
+          "uploadFile": "6000",
+          "downloadFile": "6000"
+        },
+        "package": "com.sud.cocos",
+        "minPlatformVersion": "2.0.0",
+        "versionCode": "1",
+        "runtimeVersion": "1056",
+        "minRuntimeVersion": "2.0.0",
+        "encryptKey": "00112233445566778899aabbccddeeff",
+        "workers": "",
+        "context": {},
+        "context_signature": "",
+        "context_signature_version": "",
+        "context_ordered_json": "",
+        "public_key": "",
+        "permissions": [],
+        "fullScreen": true,
+        "backgroundColor": "#000000",
+        "appkey": "",
+        "uploadEnv": "prod",
+        "accessToken": "",
+        "codeVersion": "",
+        "package_id": "",
+        "useDebugKey": false,
+        "autoBuildWithOtherPlatforms": true,
+        "appid": "2111696122300706818",
+        "__version__": "1.0.0"
+      }
+    },
+    "__version__": "1.3.9",
+    "options": {
+      "openpaas": {
+        "appid": "2111696122300706818"
+      }
+    }
+  }
+}

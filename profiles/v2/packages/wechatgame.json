@@ -12,14 +12,14 @@
       "platform": "wechatgame",
       "mainBundleIsRemote": false,
       "startSceneAssetBundle": true,
-      "nativeCodeBundleMode": "both"
+      "nativeCodeBundleMode": "asmjs"
     },
     "options": {
       "wechatgame": {
         "orientation": "portrait",
         "appid": "wxa4fb383300ff5f5a",
         "buildOpenDataContextTemplate": true,
-        "separateEngine": true,
+        "separateEngine": false,
         "highPerformanceMode": false,
         "__version__": "1.0.4",
         "wasmSubpackage": true
@@ -31,6 +31,24 @@
         "appid": "wxa4fb383300ff5f5a",
         "buildOpenDataContextTemplate": true,
         "separateEngine": true,
+        "highPerformanceMode": false,
+        "__version__": "1.0.4",
+        "wasmSubpackage": true
+      },
+      "1792302540701": {
+        "orientation": "portrait",
+        "appid": "wxa4fb383300ff5f5a",
+        "buildOpenDataContextTemplate": true,
+        "separateEngine": true,
+        "highPerformanceMode": false,
+        "__version__": "1.0.4",
+        "wasmSubpackage": true
+      },
+      "1792308240300": {
+        "orientation": "portrait",
+        "appid": "wxa4fb383300ff5f5a",
+        "buildOpenDataContextTemplate": true,
+        "separateEngine": false,
         "highPerformanceMode": false,
         "__version__": "1.0.4",
         "wasmSubpackage": true

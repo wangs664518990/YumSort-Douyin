@@ -38,8 +38,8 @@ export class homeView extends DSBaseView {
 
         WxMgr.showGameQuan();
         if (KsManager.isKuaishouEnv()) {
-            // 快手:冷启动位展示开屏广告(仅3天以上老用户),代替普通启动插屏,避免双弹
-            Advertise.showSplashAds();
+            // 快手:启动位展示启动插屏(每次冷启动一次),代替普通启动插屏,避免双弹
+            Advertise.showStartupInterstitial();
         } else {
             // 其他平台维持原启动插屏
             Advertise.showInterstitialAds();

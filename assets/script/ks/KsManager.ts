@@ -15,9 +15,10 @@
  *   - 插屏      ks.createInterstitialAd({ adUnitId })    启动 30 秒后才能展示成功
  *   - Banner    ks.createBannerAd({ adUnitId, style, adIntervals })
  *   快手暂无原生模板/格子广告(createCustomAd),抖音的九宫格面板同样不适用。
+ *   快手没有开屏广告 API,启动位以插屏广告实现(见 showStartupInterstitial)。
  */
+import { sys } from "cc";
 import { App } from "../framework/DSAppManager";
-import { DSStorageKey } from "../framework/DSStorageManager";
 
 export class KsManager {
     private static _instance: KsManager = null;
@@ -31,35 +32,31 @@ export class KsManager {
 
     /**
      * 是否运行在快手小游戏环境
-     * 官方判断方式:typeof KSGameGlobal !== 'undefined'
-     * 兜底:全局 ks 对象存在
+     *
+     * 判定依据:本游戏只在抖音/快手发行,微信渠道未上线。
+     * 快手包由"微信小游戏构建 + 适配快手小游戏"产出,运行时 sys.platform 必为 WECHAT_GAME,
+     * 因此 WECHAT_GAME 即代表快手环境,不依赖任何运行时全局对象(更稳定)。
+     * 注意:若未来上线微信渠道,必须改为全局对象(KSGameGlobal/ks)判断。
      */
     public static isKuaishouEnv(): boolean {
-        try {
-            const check = new Function(
-                "return typeof KSGameGlobal !== 'undefined' || typeof ks !== 'undefined';"
-            );
-            if (check()) return true;
-        } catch (e) {
-            // 忽略,继续走 window 判断
-        }
-        const w: any = typeof window !== "undefined" ? window : null;
-        return !!(w && w["ks"]);
+        if (sys.platform === sys.Platform.WECHAT_GAME) return true;
+        // 非微信构建(如调试环境)下按全局对象兜底
+        // @ts-ignore 快手运行时全局对象,编译期无声明
+        if (typeof ks !== "undefined" && ks) return true;
+        // @ts-ignore
+        if (typeof KSGameGlobal !== "undefined") return true;
+        return false;
     }
 
     /** 获取快手平台全局对象 ks,非快手环境返回 null */
     public static getKs(): any {
+        // @ts-ignore 快手运行时全局对象,编译期无声明(引用与判断需写在同一行)
+        const ksApi: any = typeof ks !== "undefined" ? ks : null;
+        if (ksApi) return ksApi;
+        // 兜底:个别运行时仅挂在 window 上
         const w: any = typeof window !== "undefined" ? window : null;
         if (w && w["ks"]) {
             return w["ks"];
-        }
-        try {
-            // 兜底:个别运行时仅将 ks 挂在全局作用域
-            const getter = new Function("return typeof ks !== 'undefined' ? ks : undefined;");
-            const ksObj = getter();
-            if (ksObj) return ksObj;
-        } catch (e) {
-            // 忽略
         }
         return null;
     }
@@ -67,26 +64,23 @@ export class KsManager {
     // ==================== 广告位配置 ====================
     // 在快手开放平台小游戏流量主后台(https://game.kuaishou.com)申请广告位后填入,
     // 留空则不加载对应广告(相关入口会提示未开放)。
-    public videoId: string = "";         // 激励视频广告位 ID
-    public interstitialId: string = "";  // 插屏广告位 ID
-    public bannerId: string = "";        // Banner 广告位 ID
+    public videoId: string = "2300063905_01";         // 激励视频广告位 ID
+    public interstitialId: string = "2300063905_02";  // 插屏广告位 ID
+    public bannerId: string = "";        // Banner 广告位 ID(暂未申请)
     /**
-     * 开屏广告位 ID(可选)
-     * 快手小游戏没有独立开屏广告 API,开屏位以插屏广告实现;
-     * 此处可填一个专用插屏广告位用于数据统计,留空则回退使用 interstitialId。
+     * 启动插屏广告位 ID(可选)
+     * 快手小游戏没有开屏广告 API(官方仅激励视频/插屏/Banner),
+     * 启动位以插屏广告实现;此处可填一个专用插屏广告位用于单独统计,留空则回退 interstitialId。
      */
-    public splashId: string = "";
+    public startupInterstitialId: string = "";
 
     private videoAd: any = null;         // 激励视频(快手为全局单例)
     private interstitialAd: any = null;  // 插屏
     private bannerAd: any = null;        // Banner
-    private splashAd: any = null;        // 开屏(插屏实现)
+    private startupAd: any = null;       // 启动插屏(插屏实现)
 
-    /** 开屏广告本次冷启动是否已展示(每次启动最多一次) */
-    private splashShown: boolean = false;
-
-    /** 老用户判定阈值:首次游玩满 3 天(含) */
-    private static readonly OLD_USER_MS: number = 3 * 24 * 60 * 60 * 1000;
+    /** 启动插屏本次冷启动是否已展示(每次启动最多一次) */
+    private startupShown: boolean = false;
 
     /** 当前激励视频关闭回调引用(移除监听时需要按函数引用传参) */
     private videoCloseHandler: any = null;
@@ -300,53 +294,38 @@ export class KsManager {
         }
     }
 
-    // ==================== 开屏广告 ====================
+    // ==================== 启动插屏 ====================
 
     /**
-     * 是否老用户(首次游玩时间在 3 天前,含第 3 天)
-     * 首次游玩时间在 DSStorageManager.init() 时写入本地缓存,仅首次记录。
-     */
-    isOldUser(): boolean {
-        const firstPlayTime = App.storage.getNumber(DSStorageKey.First_Play_Time, 0);
-        if (firstPlayTime <= 0) return false;
-        return Date.now() - firstPlayTime >= KsManager.OLD_USER_MS;
-    }
-
-    /**
-     * 展示开屏广告
-     * 规则:仅快手平台、仅首次游玩满 3 天的老用户、每次冷启动最多一次。
+     * 展示启动插屏(快手启动位广告)
+     * 规则:仅快手平台、每次冷启动最多一次,所有用户可见。
      *
-     * 实现说明:快手小游戏没有独立开屏广告 API(ks.createSplashAd 不存在),
-     * 开屏位以插屏广告实现;受平台频控限制(冷启动 30 秒内不允许播放插屏),
-     * 会在启动 31 秒后展示,请知悉这与真正意义上的"启动瞬间全屏广告"有时差。
+     * 实现说明:快手小游戏没有开屏广告 API,启动位以插屏广告实现;
+     * 受平台频控限制(冷启动 30 秒内不允许播放插屏),会在启动约 31 秒后展示。
      */
-    showSplashAds(): void {
+    showStartupInterstitial(): void {
         if (!KsManager.isKuaishouEnv()) return;
-        if (this.splashShown) return;
-        if (!this.isOldUser()) {
-            console.log("[KsManager] 新用户(首次游玩未满3天)不展示开屏广告");
+        if (this.startupShown) return;
+        const adUnitId = this.startupInterstitialId !== "" ? this.startupInterstitialId : this.interstitialId;
+        if (adUnitId === "") {
+            console.log("[KsManager] 未配置启动插屏/插屏广告位,跳过启动插屏");
             return;
         }
-        const splashId = this.splashId !== "" ? this.splashId : this.interstitialId;
-        if (splashId === "") {
-            console.log("[KsManager] 未配置开屏/插屏广告位,跳过开屏广告");
-            return;
+        this.startupShown = true;
+        if (!this.startupAd) {
+            this.startupAd = this.createInterstitialAd(adUnitId);
         }
-        this.splashShown = true;
-        if (!this.splashAd) {
-            this.splashAd = this.createInterstitialAd(splashId);
-        }
-        if (!this.splashAd) return;
-        console.log("[KsManager] 老用户冷启动,已调度开屏广告");
+        if (!this.startupAd) return;
+        console.log("[KsManager] 已调度启动插屏");
         const elapsed = Date.now() - this.bootTime;
         if (elapsed < 30000) {
             // 平台频控:冷启动 30 秒内插屏必失败,延迟到 31 秒
             setTimeout(() => {
-                this.showInterstitialAdInternal(this.splashAd);
+                this.showInterstitialAdInternal(this.startupAd);
             }, 31000 - elapsed);
             return;
         }
-        this.showInterstitialAdInternal(this.splashAd);
+        this.showInterstitialAdInternal(this.startupAd);
     }
 
     // ==================== Banner ====================

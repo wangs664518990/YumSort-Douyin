@@ -15,13 +15,11 @@ export class Ads {
     private interstitialId: string = "adunit-cc8d1c13a6baa75a";// 插屏r广告id
     private customAdId: string = "adunit-7fd41f723ce235c8";// 格子广告id
 
-    private isTest:boolean = true;
     constructor() {
         this.init();
     }
 
     init() {
-        if(this.isTest)return;
         if (KsManager.isKuaishouEnv()) {
             // 快手环境:广告走 ks.* 接口(详见 KsManager)
             console.log('--------------init ks ads-----------------');
@@ -107,7 +105,6 @@ export class Ads {
 
     /** 显示格子广告 */
     showCoustomAd() {
-        if(this.isTest)return;
         if (KsManager.isKuaishouEnv()) {
             // 快手暂不支持原生模板/格子广告
             console.log('[Ads] 快手平台不支持格子广告');
@@ -120,7 +117,6 @@ export class Ads {
 
     /** 隐藏格子广告 */
     hideCoustomAd() {
-        if(this.isTest)return;
         if (KsManager.isKuaishouEnv()) return;
         this.customAd && this.customAd.hide();
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
@@ -128,7 +124,6 @@ export class Ads {
 
     //显示banner广告
     showBannerAds() {
-        if(this.isTest)return;
         if (KsManager.isKuaishouEnv()) {
             KsManager.instance.showBannerAds();
             return;
@@ -142,7 +137,6 @@ export class Ads {
 
     // 隐藏banner广告
     hideBannerAds() {
-        if(this.isTest)return;
         if (KsManager.isKuaishouEnv()) {
             KsManager.instance.hideBannerAds();
             return;
@@ -154,10 +148,6 @@ export class Ads {
 
     //显示视频广告
     showVideoAds(success:Function, fail?:Function) {
-        if(this.isTest){
-            success && success();
-            return;
-        };
         if(sys.platform == sys.Platform.MOBILE_BROWSER || sys.platform == sys.Platform.DESKTOP_BROWSER){
             success && success();
             return;
@@ -212,7 +202,6 @@ export class Ads {
 
     // 显示插件广告
     showInterstitialAds() {
-        if(this.isTest)return;
         if (KsManager.isKuaishouEnv()) {
             KsManager.instance.showInterstitialAds();
             return;
@@ -232,17 +221,17 @@ export class Ads {
     }
 
     /**
-     * 显示开屏广告
-     * 仅快手平台、仅首次游玩满 3 天的老用户、每次冷启动最多一次(规则在 KsManager 内实现);
-     * 其他平台不展示开屏广告。
+     * 显示启动插屏(快手启动位广告)
+     * 快手没有开屏广告 API,启动位以插屏实现;
+     * 仅快手平台、每次冷启动最多一次,所有用户可见(规则在 KsManager 内实现)。
+     * 其他平台不展示。
      */
-    showSplashAds() {
-        if(this.isTest)return;
+    showStartupInterstitial() {
         if (KsManager.isKuaishouEnv()) {
-            KsManager.instance.showSplashAds();
+            KsManager.instance.showStartupInterstitial();
             return;
         }
-        // 非快手平台无开屏广告
+        // 非快手平台不展示
     }
 }
 
