@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>隐私政策</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1f2328; --muted:#5b6570; --line:#e5e7eb;
+    --accent:#c2410c; --soft:#f8f6f3; --th:#f3f4f6;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",Roboto,sans-serif;
+    font-size:16px; line-height:1.85; letter-spacing:.2px;
+  }
+  .wrap{max-width:780px; margin:0 auto; padding:40px 20px 80px}
+  header{border-bottom:2px solid var(--fg); padding-bottom:20px; margin-bottom:8px}
+  h1{font-size:26px; line-height:1.4; margin:0 0 12px; letter-spacing:.5px}
+  .meta{color:var(--muted); font-size:14px; line-height:1.9}
+  .meta span{display:inline-block; margin-right:18px}
+  .lead{margin:22px 0 0; padding:14px 16px; background:var(--soft); border-left:3px solid var(--accent); font-size:15px}
+  nav{margin:28px 0 6px; padding:18px 20px; border:1px solid var(--line); border-radius:8px; background:#fcfcfd}
+  nav b{display:block; font-size:15px; margin-bottom:10px}
+  nav ol{margin:0; padding-left:20px; columns:2; column-gap:28px; font-size:14.5px}
+  nav li{margin:4px 0; break-inside:avoid}
+  nav a{color:var(--fg); text-decoration:none; border-bottom:1px solid transparent}
+  nav a:hover{border-bottom-color:var(--accent); color:var(--accent)}
+  h2{font-size:19px; margin:40px 0 14px; padding-top:10px; border-top:1px solid var(--line); scroll-margin-top:16px}
+  h3{font-size:16.5px; margin:24px 0 10px; color:#111}
+  p{margin:10px 0}
+  ol,ul{padding-left:22px; margin:10px 0}
+  li{margin:6px 0}
+  strong{font-weight:600}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14.5px}
+  th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top}
+  th{background:var(--th); font-weight:600; white-space:nowrap}
+  td.no{color:var(--muted)}
+  .fill{background:#fff7ed; border-bottom:1px dashed var(--accent); padding:0 2px}
+  footer{margin-top:48px; padding-top:18px; border-top:1px solid var(--line); color:var(--muted); font-size:13.5px}
+  .warn{margin-top:14px; padding:12px 14px; border:1px solid #fca5a5; background:#fef2f2; color:#7f1d1d; font-size:13.5px; border-radius:6px}
+  @media (max-width:520px){
+    .wrap{padding:26px 16px 60px}
+    h1{font-size:22px}
+    nav ol{columns:1}
+    th,td{padding:7px 9px; font-size:13.5px}
+  }
+  @media print{
+    nav{display:none} .wrap{max-width:none; padding:0}
+    h2{page-break-after:avoid} table{page-break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="title">隐私政策</h1>
+    <div class="meta">
+      <span id="m-update"></span><span id="m-effective"></span>
+    </div>
+    <p class="lead" id="lead"></p>
+  </header>
+
+  <nav id="nav">
+    <b>本政策将帮助您了解以下内容</b>
+    <ol id="toc"></ol>
+  </nav>
+
+  <main id="body"></main>
+
+  <div class="warn" id="fallback" hidden>
+    未找到该游戏的配置。请检查链接中的 <code>?game=</code> 参数,或在该文件顶部的 <code>GAMES</code> 配置中新增对应游戏。
+  </div>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+/* ============================================================
+   游戏配置表 —— 「传入游戏名字，获取具体信息」的核心
+   用法: privacy-policy.html?game=美食餐厅爱消消
+        也可用 URL 参数临时覆盖运营信息:
+        ?game=xxx&operator=公司名&email=a@b.com&address=地址
+   新增游戏:在 GAMES 里照抄一份改字段即可,不需要改页面结构。
+   ============================================================ */
+const GAMES = {
+  "美食餐厅爱消消": {
+    operator: "【运营主体名称】",
+    address: "【注册地址】",
+    email: "【联系邮箱】",
+    updated: "2026 年 10 月 30 日",
+    effective: "2026 年 10 月 30 日",
+    genre: "单机消除类",
+    platform: "TapTap 小游戏",
+    // 本游戏的实际业务特征,直接决定下面哪些条款出现
+    hasAccount: false,      // 无账号体系
+    hasPayment: false,      // 无内购/无支付
+    realNameByPlatform: true, // 实名与防沉迷由平台托管
+    ads: true,              // 含广告变现
+    sdks: [
+      {
+        name: "TapTap 小游戏开放平台",
+        provider: "易玩(上海)网络科技有限公司",
+        data: "平台账号标识、设备信息、运行日志",
+        purpose: "提供小游戏运行环境、登录与实名防沉迷",
+        site: "https://www.taptap.cn"
+      },
+      {
+        name: "Dirichlet(TapADN)广告聚合",
+        provider: "易玩(上海)网络科技有限公司",
+        data: "设备标识符(OAID 等)、设备型号、网络类型、IP 地址、广告交互数据",
+        purpose: "广告请求、展示、效果统计与结算",
+        site: "https://ssp.dirichlet.cn"
+      }
+    ],
+    permissions: [
+      ["网络访问", "是", "加载游戏资源、请求广告", "游戏无法启动"],
+      ["设备信息与广告标识读取", "是", "广告展示、效果统计与反作弊", "广告可能无法正常展示"],
+      ["本地存储", "是", "保存关卡进度与设置", "进度无法保存"],
+      ["振动", "是", "消除与连击的操作反馈", "无振动反馈,不影响玩法"],
+      ["相机、麦克风", "否", "—", "—"],
+      ["通讯录、短信、通话记录", "否", "—", "—"],
+      ["位置信息", "否", "—", "—"],
+      ["相册/文件", "否", "—", "—"]
+    ]
+  },
+
+  /* 复制上面这段,改成新游戏即可。字段说明见文件顶部注释。 */
+  "示例游戏": {
+    operator: "【运营主体名称】",
+    address: "【注册地址】",
+    email: "【联系邮箱】",
+    updated: "2026 年 10 月 30 日",
+    effective: "2026 年 10 月 30 日",
+    genre: "休闲益智",
+    platform: "TapTap 小游戏",
+    hasAccount: false,
+    hasPayment: false,
+    realNameByPlatform: true,
+    ads: true,
+    sdks: [],
+    permissions: [
+      ["网络访问", "是", "加载游戏资源", "游戏无法启动"],
+      ["本地存储", "是", "保存进度与设置", "进度无法保存"]
+    ]
+  }
+};
+
+const DEFAULT_GAME = "美食餐厅爱消消";
+
+/* ---------------- 以下是渲染逻辑,新增游戏不需要改 ---------------- */
+
+const qs = new URLSearchParams(location.search);
+const gameName = qs.get("game") || DEFAULT_GAME;
+const cfg = GAMES[gameName];
+
+if (!cfg) {
+  document.getElementById("fallback").hidden = false;
+  document.getElementById("nav").hidden = true;
+  document.getElementById("footer").hidden = true;
+  document.getElementById("title").textContent = "隐私政策 · 未找到配置";
+  document.title = "隐私政策 · 未找到配置";
+} else {
+  // URL 参数可临时覆盖,便于同一份 HTML 部署多个游戏
+  const operator = qs.get("operator") || cfg.operator;
+  const address  = qs.get("address")  || cfg.address;
+  const email    = qs.get("email")    || cfg.email;
+  const isPlaceholder = (v) => /^【.*】$/.test(v || "");
+
+  document.title = `${gameName} 隐私政策`;
+  document.getElementById("title").textContent = `${gameName} 隐私政策`;
+  document.getElementById("m-update").textContent = `更新日期:${cfg.updated}`;
+  document.getElementById("m-effective").textContent = `生效日期:${cfg.effective}`;
+  document.getElementById("lead").innerHTML =
+    `<strong>${operator}</strong>(注册地址:${address},以下简称"我们")系${cfg.platform}小游戏"${gameName}"` +
+    `(以下简称"本游戏")的运营者。我们深知个人信息对您的重要性,并会尽全力保护您的个人信息安全可靠。` +
+    `请您在使用本游戏前仔细阅读并充分理解本政策。您开始使用本游戏,即表示您已阅读并同意本政策。`;
+
+  const S = []; // 章节容器
+
+  /* 目录 */
+  const tocItems = [];
+  const addSection = (id, no, name, html) => {
+    tocItems.push({ id, no, name });
+    S.push(`<h2 id="${id}">${no}${name}</h2>${html}`);
+  };
+
+  /* 一、收集与使用 */
+  const collect = [];
+  collect.push(`<p>本游戏为${cfg.genre}游戏${cfg.hasAccount ? "" : ",<strong>不设账号注册</strong>"}` +
+    `${cfg.hasPayment ? "" : ",<strong>不含任何内购与付费功能</strong>"}。` +
+    `我们不会收集您的手机号码、密码${cfg.hasPayment ? "" : "、支付信息"}。在您使用本游戏的过程中,我们仅在以下必要范围内收集信息:</p>`);
+  collect.push(`<h3>(一)我们收集哪些信息</h3>`);
+  collect.push(`<p><strong>1. 保障游戏运行所必需的信息。</strong>为完成游戏加载、适配您的设备并提供稳定的运行环境,` +
+    `我们会收集:设备型号、操作系统及版本、屏幕分辨率、网络类型、IP 地址、游戏运行日志与崩溃信息。</p>`);
+  if (cfg.ads) {
+    collect.push(`<p><strong>2. 广告展示与结算所必需的信息。</strong>本游戏通过广告获得收益。为向您展示广告、` +
+      `统计广告效果并与广告平台结算,广告相关服务会收集:设备广告标识符(如 OAID)、设备型号与操作系统版本、` +
+      `网络类型、IP 地址、广告展示与点击等交互记录。上述信息用于广告投放与反作弊,<strong>不会用于识别您的真实身份</strong>。</p>`);
+  }
+  collect.push(`<p><strong>${cfg.ads ? "3" : "2"}. 游戏进度与本地设置。</strong>您的关卡进度、星级、剩余体力、` +
+    `音量与震动开关等数据,保存在您设备的本地存储(小游戏沙箱)中。<strong>这些数据不会上传至我们的服务器</strong>;` +
+    `卸载小游戏或清除平台缓存后,相关数据将被删除且无法恢复。</p>`);
+  if (cfg.realNameByPlatform) {
+    collect.push(`<p><strong>${cfg.ads ? "4" : "3"}. 实名认证与防沉迷信息。</strong>本游戏通过 ${cfg.platform} 运行,` +
+      `实名认证与未成年人防沉迷由平台统一提供与管理。<strong>我们不会收集、存储您的姓名、身份证件类型及证件号码</strong>;` +
+      `相关校验由平台完成,我们仅接收"是否可进入游戏"的结果。</p>`);
+  }
+
+  const permRows = cfg.permissions.map(([k, v, p, i]) =>
+    `<tr><td>${k}</td><td class="${v === "否" ? "no" : ""}">${v}</td><td>${p}</td><td class="${v === "否" ? "no" : ""}">${i}</td></tr>`
+  ).join("");
+  collect.push(`<h3>(二)设备权限调用情况</h3>
+    <p>我们仅在实现具体功能所必需的范围内申请权限,不会默认开启。您可以在设备或平台设置中随时关闭授权,` +
+    `关闭后对应功能将不可用,但不影响其他功能的正常使用。</p>
+    <table><thead><tr><th>权限/能力</th><th>是否调用</th><th>使用目的</th><th>关闭后的影响</th></tr></thead>
+    <tbody>${permRows}</tbody></table>`);
+
+  const useList = [
+    "用于向您提供、维护和改进本游戏的基础功能;",
+    "用于保障游戏运行安全,识别并处理异常、崩溃与作弊行为;"
+  ];
+  if (cfg.ads) useList.push("用于广告展示、效果统计与结算;");
+  useList.push("用于汇总统计(如日活跃、关卡通过率),该等统计结果不含可识别您个人身份的信息。");
+  collect.push(`<h3>(三)我们如何使用您的个人信息</h3><ol>${useList.map(t => `<li>${t}</li>`).join("")}</ol>
+    <p>当我们需要将您的个人信息用于本政策未载明的其他目的时,会再次征得您的明示同意。</p>`);
+  collect.push(`<h3>(四)无需征得授权同意的情形</h3>
+    <p>根据相关法律法规及国家标准,以下情形中我们收集、使用您的个人信息无需征得您的授权同意:` +
+    `与我们履行法律法规规定的义务相关的;与国家安全、国防安全直接相关的;与公共安全、公共卫生、重大公共利益直接相关的;` +
+    `与刑事侦查、起诉、审判和判决执行等直接相关的;出于维护您或其他个人的生命、财产等重大合法权益但又很难得到本人同意的;` +
+    `您自行向社会公众公开的;根据您的要求签订和履行合同所必需的;从合法公开披露的信息中收集的;` +
+    `维护本游戏安全稳定运行所必需的(如发现、处置故障)。</p>`);
+  addSection("s1", "一、", "我们如何收集和使用您的个人信息", collect.join(""));
+
+  /* 二、保存 */
+  addSection("s2", "二、", "我们如何保存您的个人信息", `
+    <ol>
+      <li>我们仅在实现本政策所述目的所必需的最短期限内保存您的个人信息,超出期限后将予以删除或匿名化处理。</li>
+      <li>我们在中华人民共和国境内运营过程中收集和产生的个人信息,存储于中国境内。如需向境外提供,我们将另行取得您的同意,并依法履行相应程序。</li>
+      <li>游戏进度等数据存储于您的设备本地,由您自行控制;您可通过清除小游戏缓存或卸载的方式删除。</li>
+    </ol>`);
+
+  /* 三、Cookies */
+  addSection("s3", "三、", "我们如何使用 Cookies 和同类技术",
+    cfg.ads
+      ? `<p>本游戏运行于小游戏容器内,不使用浏览器 Cookie。为保障广告正常展示与频次控制,广告相关服务可能在您的设备本地写入标识符或缓存文件,用于记录广告展示频次与防止重复计费。您可以通过清除平台缓存的方式清除上述本地标识。</p>`
+      : `<p>本游戏运行于小游戏容器内,不使用浏览器 Cookie,也不使用同类本地追踪技术。</p>`);
+
+  /* 四、共享转让披露 */
+  const share = [];
+  if (cfg.ads) {
+    share.push(`<h3>(一)委托处理</h3><p>我们会委托第三方服务提供商处理实现功能所必需的信息,包括广告投放与效果统计服务。我们会与受托方约定处理目的、方式与保护措施,并监督其处理活动。</p>`);
+  }
+  share.push(`<h3>(${cfg.ads ? "二" : "一"})共享</h3><p>我们不会向第三方共享您的个人信息,但以下情形除外:事先获得您的明确同意;依据法律法规规定或政府主管部门的强制性要求;` +
+    (cfg.ads ? `为完成广告展示与结算,向广告服务提供方提供去标识化的设备信息与广告交互数据。` : `为履行法定义务所必需。`) + `</p>`);
+  share.push(`<h3>(${cfg.ads ? "三" : "二"})转让</h3><p>我们不会将您的个人信息转让给任何公司、组织和个人。如因合并、收购、资产转让或破产清算涉及个人信息转让,我们会要求新的持有方继续受本政策约束,否则将重新征得您的同意。</p>`);
+  share.push(`<h3>(${cfg.ads ? "四" : "三"})公开披露</h3><p>除法律法规明确规定或经您明确同意外,我们不会公开披露您的个人信息。</p>`);
+  addSection("s4", "四、", "我们如何共享、转让、公开披露您的个人信息", share.join(""));
+
+  /* 五、第三方 SDK */
+  const sdkRows = cfg.sdks.length
+    ? cfg.sdks.map(s => `<tr><td>${s.name}</td><td>${s.provider}</td><td>${s.data}</td><td>${s.purpose}</td></tr>`).join("")
+    : `<tr><td colspan="4" class="no">本游戏未接入第三方 SDK。</td></tr>`;
+  addSection("s5", "五、", "第三方产品或服务如何获取您的个人信息", `
+    <p>为向您提供登录、运行环境${cfg.ads ? "与广告" : ""}服务,本游戏接入了下述第三方软件开发工具包(SDK)。各 SDK 的具体信息收集行为由其提供方负责,建议您同时阅读其隐私政策。</p>
+    <table><thead><tr><th>SDK 名称</th><th>提供方</th><th>收集的信息</th><th>使用目的</th></tr></thead><tbody>${sdkRows}</tbody></table>
+    ${cfg.ads ? `<p>上述广告聚合服务可能对接其他广告网络,相关数据由聚合服务按其规则处理。各服务的隐私政策以其官方公示版本为准:` +
+      cfg.sdks.map(s => `<a href="${s.site}" target="_blank" rel="noopener">${s.site.replace(/^https?:\/\//, "")}</a>`).join("、") + `。</p>` : ""}`);
+
+  /* 六、保护 */
+  addSection("s6", "六、", "我们如何保护您的个人信息", `
+    <ol>
+      <li>我们采取行业通行的安全技术与管理措施(如传输加密、访问控制、最小权限)保护您的个人信息,防止未经授权的访问、泄露、篡改或丢失。</li>
+      <li>互联网环境并非百分之百安全,我们无法始终保证信息绝对安全。若发生个人信息安全事件,我们将按法律法规要求及时告知您事件情况、可能影响及我们已采取的处置措施。</li>
+      <li>我们仅允许因工作需要必须接触相关信息的员工访问,并对其行为进行约束与审计。</li>
+    </ol>`);
+
+  /* 七、权利 */
+  const rights = [
+    `<strong>访问与更正</strong>:您可在游戏内直接查看关卡进度、体力、设置等信息;如需更正,可通过本政策载明的方式联系我们。`,
+    `<strong>删除</strong>:您可通过清除小游戏缓存、卸载小游戏的方式删除本地数据;如需删除我们持有的其他信息,可联系我们处理。`,
+    `<strong>撤回同意</strong>:您可通过设备或平台设置关闭相应权限,或联系我们撤回授权。撤回后我们将不再收集对应信息,但不影响撤回前基于您的同意已进行的处理。`,
+    cfg.hasAccount
+      ? `<strong>注销账号</strong>:您可通过本政策载明的方式申请注销账号,注销后我们将停止为您提供服务并删除相关信息。`
+      : `<strong>注销账号</strong>:本游戏不设账号体系,不涉及账号注销。`,
+    `<strong>响应您的请求</strong>:我们将在收到您的请求并核验身份后 15 个工作日内予以答复。对于多次重复或超出合理限度的请求,我们可能视情况收取必要成本费用。`
+  ];
+  addSection("s7", "七、", "您如何管理您的个人信息", `
+    <ol>${rights.map(t => `<li>${t}</li>`).join("")}</ol>
+    <p>如出现法律法规规定的情形(如涉及国家安全、公共利益、刑事侦查,或您存在主观恶意滥用权利等),我们可能无法响应您的请求,并会向您说明理由。</p>`);
+
+  /* 八、未成年人 */
+  addSection("s8", "八、", "我们如何处理未成年人的个人信息", `
+    <ol>
+      <li>我们非常重视未成年人个人信息保护。若您是未满 14 周岁的儿童,请务必在监护人的陪同下阅读本政策,并在取得监护人同意后使用本游戏及向我们提供信息。</li>
+      <li>若您是未成年人的监护人,请关注您所监护的未成年人是否在取得您的同意后使用本游戏。如对其个人信息有疑问,可通过本政策载明的方式联系我们。</li>
+      ${cfg.realNameByPlatform ? `<li><strong>未成年人游戏时段与时长限制</strong>:本游戏通过 ${cfg.platform} 运行,相关限制由平台的未成年人健康系统执行。根据国家规定,未成年人仅可在周五、周六、周日及法定节假日的 20:00 至 21:00 期间进行游戏,其他时段将无法进入。</li>` : ""}
+    </ol>`);
+
+  /* 九、更新 */
+  addSection("s9", "九、", "本政策如何更新", `
+    <ol>
+      <li>我们可能适时修订本政策,修订后的版本将在本页面公布并标注更新日期。</li>
+      <li>对于重大变更(如服务模式发生重大变化、个人信息共享对象发生重大变化、您行使权利的方式发生重大变化),我们会以显著方式另行通知您。</li>
+      <li>若您在政策更新后继续使用本游戏,即视为您接受修订后的政策;如您不同意,请停止使用。</li>
+    </ol>`);
+
+  /* 十、联系 */
+  addSection("s10", "十、", "如何联系我们", `
+    <p>如您对本政策或个人信息保护有任何疑问、意见或投诉,可通过以下方式联系我们:</p>
+    <ul>
+      <li>运营主体:${operator}</li>
+      <li>联系邮箱:${email}</li>
+      <li>注册地址:${address}</li>
+    </ul>
+    <p>我们将在收到您的反馈后 15 个工作日内予以回复。如您认为我们的处理行为损害了您的合法权益,且与我们协商未能解决,` +
+    `您还可以向网信、市场监管等主管部门投诉,或向有管辖权的人民法院提起诉讼。</p>`);
+
+  document.getElementById("toc").innerHTML =
+    tocItems.map(t => `<li><a href="#${t.id}">${t.no}${t.name}</a></li>`).join("");
+  document.getElementById("body").innerHTML = S.join("");
+
+  const pending = [operator, address, email].filter(isPlaceholder);
+  document.getElementById("footer").innerHTML =
+    `<div>本政策自 ${cfg.effective} 起生效。</div>` +
+    `<div style="margin-top:8px">${gameName} · ${cfg.platform} · ${cfg.genre}</div>` +
+    (pending.length ? `<div style="margin-top:10px;color:#b45309">⚠ 发布前请替换占位符:${pending.join("、")}</div>` : "");
+}
+</script>
+</body>
+</html>
