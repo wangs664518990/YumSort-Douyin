@@ -549,6 +549,80 @@
         },
         "time": "2026-10-18 15:25:04",
         "dirty": false
+      },
+      "1793337373181": {
+        "type": "build",
+        "id": "1793337373181",
+        "progress": 1,
+        "state": "success",
+        "stage": "build",
+        "message": "2026-10-30 13:17:10 build success in 57 s!",
+        "detailMessage": "build task(android) in 57416!\r",
+        "options": {
+          "name": "CCC3.8.8_food_sort_newFrame",
+          "server": "",
+          "engineModulesConfigKey": "defaultConfig",
+          "platform": "android",
+          "buildPath": "project://build",
+          "debug": false,
+          "buildMode": "normal",
+          "mangleProperties": false,
+          "md5Cache": false,
+          "skipCompressTexture": false,
+          "sourceMaps": false,
+          "overwriteProjectSettings": {
+            "macroConfig": {
+              "cleanupImageCache": "inherit-project-setting"
+            },
+            "includeModules": {
+              "physics": "inherit-project-setting",
+              "physics-2d": "inherit-project-setting",
+              "gfx-webgl2": "off"
+            }
+          },
+          "nativeCodeBundleMode": "wasm",
+          "polyfills": {
+            "asyncFunctions": false
+          },
+          "experimentalEraseModules": false,
+          "startSceneAssetBundle": false,
+          "bundleConfigs": [],
+          "inlineEnum": true,
+          "useBuiltinServer": false,
+          "md5CacheOptions": {
+            "excludes": [],
+            "includes": [],
+            "replaceOnly": [],
+            "handleTemplateMd5Link": true
+          },
+          "mainBundleIsRemote": false,
+          "mainBundleCompressionType": "merge_dep",
+          "useSplashScreen": true,
+          "bundleCommonChunk": false,
+          "packAutoAtlas": true,
+          "startScene": "5707c3c2-5bee-458e-b287-a8b13ade06c9",
+          "outputName": "android",
+          "taskName": "android",
+          "scenes": [
+            {
+              "url": "db://assets/scene/game.scene",
+              "uuid": "5707c3c2-5bee-458e-b287-a8b13ade06c9"
+            }
+          ],
+          "wasmCompressionMode": false,
+          "binGroupConfig": {
+            "threshold": 16,
+            "enable": false
+          },
+          "packages": {},
+          "__version__": "1.3.9",
+          "__builderUiTaskNavigation": "mvuiorud-pbleul47wv:4",
+          "taskId": "1793337373181",
+          "__builderUiTaskTime": 1793337373181,
+          "logDest": "project://temp/builder/log/android2026-10-30 13-16.log"
+        },
+        "time": "2026-10-30 13:16:13",
+        "dirty": false
       }
     }
   }

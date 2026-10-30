@@ -24,6 +24,7 @@
 import { sys } from "cc";
 import { App } from "../framework/DSAppManager";
 import { DSPlatform } from "../framework/DSPlatform";
+import { DSStorageKey } from "../framework/DSStorageManager";
 import { TapNativeBridge } from "./TapNativeBridge";
 
 /** 广告位配置:全部留空则不加载该广告,对应入口走"暂未开放"或静默跳过 */
@@ -233,12 +234,22 @@ export class TapManager {
 
     /** APK:经原生桥展示激励视频 */
     private showNativeRewarded(success: Function, fail?: Function): void {
+        if (TapAdConfig.rewardedId === "") {
+            App.ui.showMsgTips("视频广告暂未开放");
+            return fail && fail("未配置激励视频广告位");
+        }
         this.videoPlaying = true;
         App.global.isShowVideoAds = true;
-        TapNativeBridge.call("ad.showRewarded", {}, 15000)
+        TapNativeBridge.call("ad.showRewarded", {
+            spaceId: TapAdConfig.rewardedId,
+            userId: App.storage.getString(DSStorageKey.TapUserId, ""),
+            rewardName: "体力",
+            rewardAmount: 1,
+        }, 20000)
             .then((res) => {
                 this.videoPlaying = false;
                 App.global.isShowVideoAds = false;
+                // 原生只有 onRewardVerify 通过后才会回 code=1
                 if (res && res.code === 1) {
                     return success && success("激励奖励已发放");
                 }
@@ -291,7 +302,9 @@ export class TapManager {
         }
         if (DSPlatform.isTapNative) {
             this.lastInterstitialAt = now;
-            TapNativeBridge.call("ad.showInterstitial", {}, 10000).catch((e) => {
+            TapNativeBridge.call("ad.showInterstitial", {
+                spaceId: TapAdConfig.interstitialId,
+            }, 10000).catch((e) => {
                 console.log("[TapManager] 原生插屏失败", e);
             });
             return;
@@ -354,7 +367,10 @@ export class TapManager {
         if (!this.isTap) return;
         if (TapAdConfig.isTest) return;
         if (DSPlatform.isTapNative) {
-            TapNativeBridge.call("ad.showBanner", {}, 5000).catch(() => { });
+            if (TapAdConfig.bannerId === "") return;
+            TapNativeBridge.call("ad.showBanner", {
+                spaceId: TapAdConfig.bannerId,
+            }, 6000).catch(() => { });
             return;
         }
         if (TapAdConfig.bannerId === "") return;

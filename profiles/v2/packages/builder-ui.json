@@ -1,5 +1,9 @@
 {
-  "__version__": "1.1.16",
+  "__version__": "1.1.56",
   "panelCategory": "native",
-  "panelView": "history"
+  "panelView": "history",
+  "panelNavigation": {
+    "category": "native",
+    "view": "history"
+  }
 }

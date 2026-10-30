@@ -75,12 +75,18 @@ Tap 小游戏和快手一样,都是"**微信小游戏构建产物 + 转换插件
 
 ### 3.2 APK
 
-1. Cocos 构建平台选 **Android**(原生),得到原生工程;
-2. 原生工程里集成 **TapSDK(Android AAR)** 与 **Dirichlet 广告 SDK**;
-3. 实现 JS↔原生桥(见第五节),把第五节列的方法补齐;
-4. 出包上传 TapTap 开发者中心。
+原生工程已生成在 **`native/engine/android/`**(Cocos Creator 3.8 的原生工程目录,随工程走 git)。
 
-> **本轮未做**:原生工程尚未生成(仓库里没有 native 构建产物),所以 Gradle 依赖与 Java 桥接实现**未落地**,只落了 TS 侧完整契约。这是本分支最大的未完成项,见第八节。
+**代码侧已完成**,只剩放 SDK 和填参数两步:
+
+1. **放 AAR**:把 TapSDK 与 Dirichlet 的 aar 拷到 `native/engine/android/app/libs/`。
+   `app/build.gradle` 里已有 `implementation fileTree(dir: 'libs', include: ['*.jar','*.aar'])`,
+   **不需要改 gradle**,放进去就自动参与编译与打包。
+2. **填参数**:编辑 `native/engine/android/app/src/com/cocos/game/tap/TapConfig.java`
+   填 `CLIENT_ID` / `MEDIA_ID` / `MEDIA_NAME` / `MEDIA_KEY`。
+3. **出包**:Cocos Creator「构建发布 → Android」或直接 `build/android/proj` 下 gradle 编译。
+
+> `MEDIA_KEY` 是密钥,别提交到公开仓库;如果这份工程要多人协作或开源,改成从 `local.properties` 注入。
 
 ---
 
@@ -96,19 +102,26 @@ Tap 小游戏和快手一样,都是"**微信小游戏构建产物 + 转换插件
 
 ### 4.2 状态与回调码
 
-| 回调码 | 含义 | 模块状态 | 是否阻断 |
-| --- | --- | --- | --- |
-| 500 | 校验通过(未成年在可玩时段内也是 500) | `Allowed` | 否 |
-| 1095 | 未成年可玩时段提醒弹窗 | `Allowed` + 提示 | 否 |
-| 1030 | 当日时长用尽 / 当前不可玩 | `TimeLimit` | **是** |
-| 9002 | 玩家关闭了实名窗 | `NotVerified` | **是** |
-| 1000 | 受限后点"切换账号" | `SwitchAccount` | **是** |
-| `PERIOD_RESTRICT` | 非可玩时段(宵禁) | `Curfew` | **是** |
+**以官方 v3 文档「回调 code」表格为准**(早期 Unity 文档里的 1095 在 v3 表里不存在,已移除):
+
+| 回调码 | 官方常量 | 含义 | 模块状态 | 是否阻断 |
+| --- | --- | --- | --- | --- |
+| 500 | `LOGIN_SUCCESS` | 校验通过(未成年在可玩时段内也是 500) | `Allowed` | 否 |
+| 1000 | `EXITED` | 退出防沉迷流程 / 认证信息失效 | `Exited` | **是** |
+| 1001 | `SWITCH_ACCOUNT` | 玩家点了"切换账号" | `SwitchAccount` | **是** |
+| 1030 | `PERIOD_RESTRICT` | 当前时段不可玩(宵禁) | `Curfew` | **是** |
+| 1050 | `DURATION_LIMIT` | 可玩时长用尽 | `TimeLimit` | **是** |
+| 1100 | `AGE_LIMIT` | 触发应用设置的年龄限制(优先级高于 1030,无弹窗) | `AgeLimit` | **是** |
+| 1200 | `INVALID_CLIENT_OR_NETWORK_ERROR` | ClientId 配置错误 / 网络异常 | `Allowed` + 告警 | 否 |
+| 9002 | `REAL_NAME_STOP` | 玩家关闭实名窗,未完成实名 | `NotVerified` | **是** |
+
+> 1200 不拦玩家是刻意的:这是配置或网络问题,封玩家等于把自家事故转嫁给用户。
+> 但日志里出现 1200 等于**上线事故**,提审前必须清零。
 
 未成年可玩时段(国家规定):**周五、周六、周日及法定节假日 20:00-21:00**;21:00 后无法登录。
 
-> **不需要做游戏内的"防沉迷说明"页面。** 实名窗、身份校验、时长限制提示、可玩时段提醒全部由 TapSDK 自带 UI 完成
-> (回调 1095 就是它自己的弹窗),游戏侧只负责"什么时候校验 + 校验不通就不让进关"。
+> **不需要做游戏内的"防沉迷说明"页面。** 实名窗、身份校验、时长限制提示全部由 TapSDK 自带 UI 完成,
+> 游戏侧只负责"什么时候校验 + 校验不通就不让进关"。
 > 启动页已有的「健康游戏忠告 + 已接入健康系统」文案已经覆盖了合规展示要求。
 
 ### 4.3 拦截点
@@ -143,32 +156,49 @@ assets/script/
 ├── wx/
 │   ├── advertise.ts           # 改造:广告门面增加 Tap 分发(4 个平台统一入口)
 │   └── wxManager.ts           # 改造:Tap 跳过微信登录/游戏圈/云数据,震动与分享走 Tap
-├── ks/KsManager.ts            # 改造:isKuaishouEnv() 前置排除 Tap
-└── rank/utils/GameUtils.ts    # 改造:isWx 排除 Tap(无微信开放数据域)
+| `ks/KsManager.ts` | 改造:isKuaishouEnv() 前置排除 Tap |
+| `rank/utils/GameUtils.ts` | 改造:isWx 排除 Tap(无微信开放数据域) |
+
+原生工程:
+
+```
+native/engine/android/app/
+├── src/com/cocos/game/
+│   ├── AppActivity.java              # 改造:onCreate 里加一行 TapBridge.init(this)
+│   └── tap/
+│       ├── TapBridge.java            # 新增:JS↔Java 桥 + 协议分发 + 线程切换
+│       ├── TapReflect.java           # 新增:反射调用工具(按签名找方法、动态代理)
+│       ├── TapAntiAddictionImpl.java # 新增:防沉迷(TapSDK),按重载自适应 3 种 init 形态
+│       ├── TapAdImpl.java            # 新增:广告(Dirichlet)激励/插屏/Banner/开屏
+│       └── TapConfig.java            # 新增:CLIENT_ID / MEDIA_* 参数(待填)
+├── proguard-rules.pro                # 改造:保留 com.tapsdk / com.taptap / tap 包(反射依赖)
+└── libs/                             # 待放:TapSDK 与 Dirichlet 的 aar
 ```
 
 **业务侧无需改动**:各界面仍调 `Advertise.showVideoAds() / showBannerAds() / showInterstitialAds() / showCoustomAd()`,由门面按平台分发。
 
-### 5.1 APK 原生桥协议(需原生侧实现)
+### 5.1 APK 原生桥协议(已实现)
 
 JS → Native:`native.bridge.sendToNative(method, JSON.stringify({ id, params }))`
 Native → JS:`onNative(method, JSON.stringify({ id, ok, code, msg, data }))`
 
-| method | params | 返回 | 说明 |
+| method | params | 返回 | 状态 |
 | --- | --- | --- | --- |
-| `ad.init` | `{}` | `{ok}` | 初始化 Dirichlet SDK |
-| `ad.showRewarded` | `{}` | `{code:1}` 看完 / `{code:0}` 中断 | 激励视频 |
-| `ad.showInterstitial` | `{}` | `{ok}` | 插屏 |
-| `ad.showBanner` / `ad.hideBanner` | `{}` | `{ok}` | Banner |
-| `ad.showSplash` | `{spaceId}` | `{ok}` | 开屏 |
-| `login.startup` | `{}` | `{data:{openid,unionid,accessToken}}` | TapSDK 登录 |
-| `antiaddiction.init` | `{clientId,showSwitchAccount,useAgeRange}` | `{ok}` | TapSDK 防沉迷初始化 |
-| `antiaddiction.startup` | `{userIdentifier}` | `{data:{code,msg}}` | 校验,code 见 4.2 |
-| `antiaddiction.logout` | `{}` | `{ok}` | 切换账号时清理 |
-| `device.vibrateLong` / `device.vibrateShort` | `{}` | `{ok}` | 震动 |
-| `device.share` | `{title}` | `{ok}` | 分享 |
+| `ad.init` | `{}` | `{ok}` | ✅ |
+| `ad.showRewarded` | `{spaceId, userId, rewardName, rewardAmount}` | `{code:1}` 验真发奖 / `{code:0}` 中断 | ✅ |
+| `ad.showInterstitial` | `{spaceId}` | `{ok}` | ✅ |
+| `ad.showBanner` / `ad.hideBanner` | `{spaceId}` / `{}` | `{ok}` | ✅ |
+| `ad.showSplash` | `{spaceId}` | `{ok}` | ✅ |
+| `antiaddiction.init` | `{}` | `{ok}` | ✅ |
+| `antiaddiction.startup` | `{userIdentifier}` | `{ok}`(ack,结果走事件) | ✅ |
+| `antiaddiction.logout` | `{}` | `{ok}` | ✅ |
+| `device.vibrateLong` / `device.vibrateShort` | `{}` | `{ok}` | ✅ |
+| `login.startup` | `{}` | `{ok:false}` | ⬜ 未接(本游戏无云存档需求,不阻塞) |
+| `device.share` | `{}` | `{ok:false}` | ⬜ 未接 |
 
-原生侧**未实现的方法必须回 `ok:false`**,JS 侧会走降级,不允许静默挂起(桥内有 3~30 秒超时保护)。
+主动事件(不带 id,JS 按 method 名分发):`antiaddiction.event` → `{code, msg}`
+
+> 所有原生方法没实现也必须回包(JS 侧有超时兜底),不允许静默挂起。
 
 ---
 
@@ -187,6 +217,7 @@ public static isTest: boolean = false;      // 联调置 true 直接模拟成功
 ```
 
 - 留空 = 不加载该广告,对应入口提示"暂未开放"或静默跳过,不会报错;
+- **APK 的广告位也填在这里**:JS 会把 `spaceId` 随桥参数传给原生,原生 `TapConfig` 只放媒体级参数(ID/名称/密钥),广告位不用在 Java 里再填一遍;
 - 广告位需在 Dirichlet 后台**审核通过并把属性改为"正式"、开关打开**,否则没有收益;
 - 官方注意事项:**激励视频必须玩家主动点**、**插屏间隔 ≥2 分钟**、**加载失败就跳过不要卡住流程** —— 三条都已在代码里实现。
 
@@ -226,7 +257,8 @@ public static isTest: boolean = false;      // 联调置 true 直接模拟成功
 
 | 优先级 | 事项 | 说明 |
 | --- | --- | --- |
-| **P0** | 生成 Android 原生工程,集成 TapSDK + Dirichlet AAR,实现第五节桥接方法 | 不做这步,APK 侧防沉迷与广告都是空的 |
+| **P0** | 把 TapSDK / Dirichlet 的 aar 放进 `native/engine/android/app/libs/` | gradle 已 `fileTree` 引入,放进去即可编译;不放则日志报"未找到 xxx"并降级 |
+| **P0** | 填 `TapConfig.java`(CLIENT_ID / MEDIA_ID / MEDIA_NAME / MEDIA_KEY) | 空值 = APK 侧防沉迷与广告都不生效 |
 | **P0** | 填 `TapAdConfig` 广告位 ID(小游戏位 / APP 位各一套) | 空位 = 无收益 |
 | **P0** | 小游戏前置备案 + 开发者主体认证 | 不办不能上线 |
 | P1 | 装 `tap-minigame-ts` 插件并出 `build/TapBuild/game.zip` | 出包才能真机测 |
@@ -237,21 +269,36 @@ public static isTest: boolean = false;      // 联调置 true 直接模拟成功
 > 已确认不做:游戏内「防沉迷说明」独立页(TapSDK 自带界面)、游戏内隐私政策入口(改走后台链接)。
 > 「健康游戏忠告 + 防沉迷声明」已在 `loadingView.prefab`,无需改动。
 
+### 8.1 关于反射调用(重要,别当 bug 改)
+
+原生侧对 TapSDK / Dirichlet 全部走**反射**,不是没写 import 的疏忽:
+
+- 好处:仓库里没有 AAR 也能编译通过(否则现在 APK 构建会直接红),换 SDK 版本不用改代码;
+- 代价:**没有编译期检查**。所以每次换 SDK 版本后必须真机跑一遍,看日志有没有:
+  - `未找到 AntiAddictionUIKit` / `未找到 TapAD SDK` → AAR 没放对目录;
+  - `没有找到可用的 init 重载` / `缺少方法 xxx` / `startup signature not found` → SDK 版本与代码预期不符;
+- 反射调用点集中在这几个类,改起来很轻:`TapAntiAddictionImpl`(3 个候选包名 + 3 种 init 重载)、`TapAdImpl`(4 种广告)、`TapReflect`(通用工具)。
+
+> 如果后续想换回强类型调用(有编译期检查),做法是:把 aar 放进 `libs/` 后,
+> 用 `implementation files('libs/xxx.aar')` 显式引入 + 把这几个 Impl 类改成直接 import 对应类。
+> 换之前先确认 `javap -classpath classes.jar` 能看到真实方法签名。
+
 ---
 
 ## 九、上线检查清单
 
 - [ ] `DSPlatform` 判定正确:小游戏真机日志显示 `tap-mini`,APK 显示 `tap-native`
+- [ ] APK 日志出现 `TapBridge: bridge ready`,且**没有** `未找到 AntiAddictionUIKit` / `未找到 TapAD SDK`
 - [ ] 日志中**无** `[防沉迷] 告警:`(有 = 降级放行,提审会被打回)
 - [ ] 实名弹窗真机可拉起,未实名账号被正确拦截
-- [ ] 受限回调(1030 / 9002 / PERIOD_RESTRICT)能踢回首页并给出对应文案
+- [ ] 受限回调(1000 / 1001 / 1030 / 1050 / 1100 / 9002)能踢回首页并给出对应文案
 - [ ] 激励视频:主动点击 → 看完发奖 → 中途关闭不发奖 → **连点不会重复发奖**
 - [ ] 插屏:2 分钟内连续调用只弹一次
 - [ ] Banner:不遮挡底部按钮;切场景正确显示/隐藏
 - [ ] Tap 小游戏 TapTap 登录可用(未接会导致 TapTap 用户无法游玩)
 - [ ] 启动页「健康游戏忠告 + 防沉迷声明」文案已按双形态改为"本游戏"(不再是"小游戏")
 - [ ] TapTap 后台已填隐私政策链接(游戏内不放,但后台必填)
-- [ ] 提审前把 `TapAdConfig.isTest` 改回 `false`
+- [ ] 提审前把 `TapAdConfig.isTest` 与 `TapConfig.DEBUG` 都改回 `false`
 - [ ] 包体 ≤60MB;wasm br >10MB 已开分包
 - [ ] 版本号 `V x.y.z`,唯一且高于已上线版本
 - [ ] 抖音/快手包回归:两条链路行为与改造前一致(`git diff main` 复核)

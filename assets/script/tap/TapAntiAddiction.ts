@@ -8,13 +8,18 @@
  *   3. TapSDK 防沉迷会自动对接中宣部实名认证系统,并以开发者主体上报;
  *      已在小游戏/ TapTap 完成实名的账号可静默复用,无需重复填身份证。
  *
- * 状态与回调码(TapSDK Unity/Android 文档口径):
- *   500  (ENTER_SUCCESS / LOGIN_SUCCESS) 校验通过,可玩(未成年在可玩时段内也会拿到)
- *   1000 (SWITCH_ACCOUNT)                 因防沉迷受限,玩家点了"切换账号"
- *   1030 (TIME_LIMIT)                     当日时长用尽 / 当前不可玩
- *   1095 (OPEN_ALERT)                     未成年可玩时段提醒弹窗
- *   9002 (REAL_NAME_STOP)                 玩家关闭了实名窗,未完成实名
- *   PERIOD_RESTRICT                       非可玩时段(宵禁:未成年仅周五/六/日及节假日 20:00-21:00)
+ * 状态与回调码(**官方 v3 文档回调表,已逐条核对**):
+ *   500  LOGIN_SUCCESS                   校验通过,可玩(未成年在可玩时段内也是 500)
+ *   1000 EXITED                          退出防沉迷流程 / 认证信息失效 → 回登录页
+ *   1001 SWITCH_ACCOUNT                  玩家点了"切换账号"
+ *   1030 PERIOD_RESTRICT                 当前时段不可玩(宵禁:未成年仅周五/六/日及节假日 20:00-21:00)
+ *   1050 DURATION_LIMIT                  可玩时长用尽
+ *   1100 AGE_LIMIT                       触发应用设置的年龄限制(优先级高于 1030,无弹窗)
+ *   1200 INVALID_CLIENT_OR_NETWORK_ERROR ClientId/网络异常 → 属配置或网络问题,不封玩家
+ *   9002 REAL_NAME_STOP                  玩家关闭实名窗,未完成实名
+ *
+ * 注意:早期 Unity 文档里的 1095(OPEN_ALERT)在 v3 回调表里**不存在**,
+ *       不要用它来判断任何状态;Android 侧另有 OPEN_ALERT_TIP 常量,仅作提示、不拦截。
  *
  * 文档:
  *   防沉迷开发指南  https://developer.taptap.cn/docs/v3/sdk/anti-addiction/guide
@@ -42,22 +47,29 @@ export enum AntiAddictionState {
     Checking = 1,
     /** 可玩 */
     Allowed = 2,
-    /** 时长用尽 */
+    /** 可玩时长用尽(1050) */
     TimeLimit = 3,
-    /** 非可玩时段(宵禁) */
+    /** 当前时段不可玩 / 宵禁(1030) */
     Curfew = 4,
-    /** 未完成实名 */
+    /** 未完成实名(9002) */
     NotVerified = 5,
-    /** 玩家选择切换账号 */
+    /** 玩家选择切换账号(1001) */
     SwitchAccount = 6,
+    /** 防沉迷流程退出 / 认证信息失效(1000) */
+    Exited = 7,
+    /** 年龄限制(1100) */
+    AgeLimit = 8,
 }
 
-/** TapSDK 防沉迷回调码 */
+/** TapSDK v3 防沉迷回调码(官方回调表) */
 export const AntiAddictionCode = {
-    ENTER_SUCCESS: 500,
-    SWITCH_ACCOUNT: 1000,
-    TIME_LIMIT: 1030,
-    OPEN_ALERT: 1095,
+    LOGIN_SUCCESS: 500,
+    EXITED: 1000,
+    SWITCH_ACCOUNT: 1001,
+    PERIOD_RESTRICT: 1030,
+    DURATION_LIMIT: 1050,
+    AGE_LIMIT: 1100,
+    INVALID_CLIENT_OR_NETWORK: 1200,
     REAL_NAME_STOP: 9002,
 };
 
@@ -149,37 +161,57 @@ export class TapAntiAddiction {
         if (!DSPlatform.isTapNative) return;
         this._state = AntiAddictionState.Checking;
         this.notify();
-        TapNativeBridge.call("antiaddiction.startup", { userIdentifier: this.getUserIdentifier() }, 3000)
+        // 原生只是"发起",真正的结果走 antiaddiction.event 事件(玩家要填实名,可能几十秒)
+        TapNativeBridge.call("antiaddiction.startup", { userIdentifier: this.getUserIdentifier() }, 8000)
             .then((res) => {
                 this._started = true;
-                if (res && res.data && res.data.code !== undefined) {
-                    this.handleCode(res.data.code, res.data.msg);
-                } else {
-                    // 有些实现只回 ok:true,视为校验通过
-                    this.setState(AntiAddictionState.Allowed);
+                const c = (res && res.data && res.data.code !== undefined)
+                    ? res.data.code
+                    : (res ? res.code : undefined);
+                if (c !== undefined && c !== null && c !== 0) {
+                    // 少数实现会同步回结果
+                    this.handleCode(c, res && res.msg);
+                    return;
                 }
+                console.log("[防沉迷] 已发起校验,等待 SDK 回调");
+                this.startWatchdog();
             })
             .catch((e) => {
                 this._degraded = true;
-                console.log("[防沉迷] 告警:校验超时/失败,降级放行", e);
+                console.log("[防沉迷] 告警:校验发起失败,降级放行", e);
                 this.setState(AntiAddictionState.Allowed);
             });
     }
 
-    /** 处理 TapSDK 回调码 */
+    /**
+     * 看门狗:发起后迟迟没有回调(常见于 TapSDK 未真正集成、或网络挂了),
+     * 只打告警不封玩家 —— 此时 SDK 的实名窗通常也没弹出来,日志必须能看出来。
+     */
+    private static startWatchdog(): void {
+        setTimeout(() => {
+            if (this._state === AntiAddictionState.Checking) {
+                console.log("[防沉迷] 告警:发起校验 180 秒未收到回调,请检查 TapSDK 是否真正集成");
+            }
+        }, 180000);
+    }
+
+    /** 处理 TapSDK 回调码(表见文件头,或官方 v3 防沉迷文档"回调 code"表格) */
     public static handleCode(code: any, msg?: string): void {
         console.log(`[防沉迷] 回调 code=${code} msg=${msg || ""}`);
-        switch (code) {
-            case AntiAddictionCode.ENTER_SUCCESS:
+        // 兼容个别版本传字符串
+        const numeric = typeof code === "string" ? parseInt(code, 10) : code;
+        switch (numeric) {
+            case AntiAddictionCode.LOGIN_SUCCESS:
                 this.setState(AntiAddictionState.Allowed);
                 break;
-            case AntiAddictionCode.OPEN_ALERT:
-                // 未成年可玩时段提醒:不拦截,只提示
-                App.ui.showMsgTips("未成年人仅可在周五、周六、周日及法定节假日 20:00-21:00 游戏");
-                this.setState(AntiAddictionState.Allowed);
-                break;
-            case AntiAddictionCode.TIME_LIMIT:
+            case AntiAddictionCode.DURATION_LIMIT:
                 this.setState(AntiAddictionState.TimeLimit);
+                break;
+            case AntiAddictionCode.PERIOD_RESTRICT:
+                this.setState(AntiAddictionState.Curfew);
+                break;
+            case AntiAddictionCode.AGE_LIMIT:
+                this.setState(AntiAddictionState.AgeLimit);
                 break;
             case AntiAddictionCode.REAL_NAME_STOP:
                 this.setState(AntiAddictionState.NotVerified);
@@ -187,14 +219,17 @@ export class TapAntiAddiction {
             case AntiAddictionCode.SWITCH_ACCOUNT:
                 this.setState(AntiAddictionState.SwitchAccount);
                 break;
+            case AntiAddictionCode.EXITED:
+                this.setState(AntiAddictionState.Exited);
+                break;
+            case AntiAddictionCode.INVALID_CLIENT_OR_NETWORK:
+                // 配置或网络问题,不是玩家的错:不封玩家,但必须告警(上线前要清零)
+                this._degraded = true;
+                console.log("[防沉迷] 告警:ClientId 配置错误或网络异常(1200),本次降级放行");
+                this.setState(AntiAddictionState.Allowed);
+                break;
             default:
-                // Android 侧 PERIOD_RESTRICT 以字符串常量出现
-                if (code === "PERIOD_RESTRICT" || code === "period_restrict") {
-                    this.setState(AntiAddictionState.Curfew);
-                } else {
-                    console.log("[防沉迷] 未识别的回调码,按可玩处理", code);
-                    this.setState(AntiAddictionState.Allowed);
-                }
+                console.log("[防沉迷] 未识别的回调码,维持当前状态", code);
                 break;
         }
     }
@@ -237,10 +272,14 @@ export class TapAntiAddiction {
                 return "今日游戏时长已用尽,请明天再来";
             case AntiAddictionState.Curfew:
                 return "当前时段不可游戏,未成年人仅可在周五、周六、周日及法定节假日 20:00-21:00 游戏";
+            case AntiAddictionState.AgeLimit:
+                return "当前账号不满足本游戏的年龄要求,无法进入游戏";
             case AntiAddictionState.NotVerified:
                 return "需完成实名认证后才能继续游戏";
             case AntiAddictionState.SwitchAccount:
                 return "请切换为已实名的账号后再进入游戏";
+            case AntiAddictionState.Exited:
+                return "实名认证状态已失效,请重新进入游戏";
             case AntiAddictionState.Checking:
                 return "实名信息校验中,请稍候";
             default:

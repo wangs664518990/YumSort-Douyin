@@ -369,6 +369,8 @@
       "__id__": 0
     },
     "fileId": "6endOInG5GEay9tDjFXmUX",
+    "instance": null,
+    "targetOverrides": null,
     "nestedPrefabInstanceRoots": null
   },
   {
@@ -775,6 +777,8 @@
       "__id__": 0
     },
     "fileId": "78CyvLOPxBVostfpvwSY1L",
+    "instance": null,
+    "targetOverrides": null,
     "nestedPrefabInstanceRoots": null
   },
   {
@@ -817,7 +821,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": -634.2060000000001,
+      "y": -634.2059999999999,
       "z": 0
     },
     "_lrot": {
@@ -943,7 +947,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "该小游戏已接入健康系统，家长可通过成长守护功能进行监督。\n抵制不良游戏，拒绝盗版游戏。注意自我保护，谨防受骗上当。\n适度游戏益脑，沉迷游戏伤身。合理安排时间，享受健康生活。\n开发团队承诺积极履行《网络游戏防沉迷自律公约》",
+    "_string": "该游戏已接入健康系统，家长可通过成长守护功能进行监督。\n抵制不良游戏，拒绝盗版游戏。注意自我保护，谨防受骗上当。\n适度游戏益脑，沉迷游戏伤身。合理安排时间，享受健康生活。\n开发团队承诺积极履行《网络游戏防沉迷自律公约》",
     "_horizontalAlign": 0,
     "_verticalAlign": 1,
     "_actualFontSize": 20,
@@ -1684,7 +1688,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 750,
-      "height": 1625.0000000000002
+      "height": 1625
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
