@@ -80,13 +80,14 @@
 <script>
 /* ============================================================
    游戏配置表 —— 「传入游戏名字，获取具体信息」的核心
-   用法: privacy-policy.html?game=美食餐厅爱消消
-        也可用 URL 参数临时覆盖运营信息:
-        ?game=xxx&operator=公司名&email=a@b.com&address=地址
-   新增游戏:在 GAMES 里照抄一份改字段即可,不需要改页面结构。
+   用法: privacy-policy.html?game=yumsort
+   新增游戏:在 GAMES 里加一段,键名用英文短标识(slug),
+            段内 name 写游戏正式名称(会显示在页面上)。
+   其他信息(运营主体/邮箱/权限/SDK)全部写在配置里,URL 不再需要其他参数。
    ============================================================ */
 const GAMES = {
-  "美食餐厅爱消消": {
+  yumsort: {
+    name: "美食餐厅爱消消",
     operator: "【运营主体名称】",
     address: "【注册地址】",
     email: "【联系邮箱】",
@@ -127,8 +128,9 @@ const GAMES = {
     ]
   },
 
-  /* 复制上面这段,改成新游戏即可。字段说明见文件顶部注释。 */
-  "示例游戏": {
+  /* 复制上面这段,改成新游戏即可。键名用 slug,段内 name 写正式名称。 */
+  demo: {
+    name: "示例游戏",
     operator: "【运营主体名称】",
     address: "【注册地址】",
     email: "【联系邮箱】",
@@ -148,25 +150,28 @@ const GAMES = {
   }
 };
 
-const DEFAULT_GAME = "美食餐厅爱消消";
+const DEFAULT_GAME = "yumsort";
 
 /* ---------------- 以下是渲染逻辑,新增游戏不需要改 ---------------- */
 
 const qs = new URLSearchParams(location.search);
-const gameName = qs.get("game") || DEFAULT_GAME;
-const cfg = GAMES[gameName];
+const gameKey = qs.get("game") || DEFAULT_GAME;
+// 支持按 slug 查;也兼容直接传中文游戏名(老链接不失效)
+const cfg = GAMES[gameKey] || Object.values(GAMES).find(g => g.name === gameKey);
 
 if (!cfg) {
-  document.getElementById("fallback").hidden = false;
+  const box = document.getElementById("fallback");
+  box.hidden = false;
+  box.innerHTML += `<p style="margin:10px 0 0">请求的游戏标识:<code>${gameKey}</code></p>`;
   document.getElementById("nav").hidden = true;
   document.getElementById("footer").hidden = true;
   document.getElementById("title").textContent = "隐私政策 · 未找到配置";
   document.title = "隐私政策 · 未找到配置";
 } else {
-  // URL 参数可临时覆盖,便于同一份 HTML 部署多个游戏
-  const operator = qs.get("operator") || cfg.operator;
-  const address  = qs.get("address")  || cfg.address;
-  const email    = qs.get("email")    || cfg.email;
+  const gameName = cfg.name;          // 显示用名称
+  const operator = cfg.operator;
+  const address  = cfg.address;
+  const email    = cfg.email;
   const isPlaceholder = (v) => /^【.*】$/.test(v || "");
 
   document.title = `${gameName} 隐私政策`;
