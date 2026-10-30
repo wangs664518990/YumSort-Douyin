@@ -12,6 +12,8 @@ export enum DSEventKey {
     NextLevel = 'NextLevel',
     reAlive = 'reAlive',
     UpdateLife = 'UpdateLife',
+    /** 防沉迷状态变化(Tap 渠道),参数为 AntiAddictionState */
+    AntiAddictionChange = 'AntiAddictionChange',
 }
 
 /**

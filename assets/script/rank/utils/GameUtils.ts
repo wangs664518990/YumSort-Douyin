@@ -4,6 +4,7 @@ import { sys } from "cc";
 import { WXUserCloudKey } from "../consts/GameConsts";
 import { App } from "../../framework/DSAppManager";
 import { KsManager } from "../../ks/KsManager";
+import { DSPlatform } from "../../framework/DSPlatform";
 export class GameUtils {
 
     /**
@@ -27,8 +28,12 @@ export class GameUtils {
      * @return {*}
      */
     public static get isWx() {
-        // 快手环境下 sys.platform 同样为 WECHAT_GAME,但无微信开放数据域,需排除
+        // 快手 / Tap 小游戏环境下 sys.platform 同样为 WECHAT_GAME,
+        // 但都没有微信开放数据域,需排除
         if (KsManager.isKuaishouEnv()) {
+            return false;
+        }
+        if (DSPlatform.isTap) {
             return false;
         }
         if (sys.platform === sys.Platform.WECHAT_GAME) {

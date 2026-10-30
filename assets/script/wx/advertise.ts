@@ -1,8 +1,18 @@
 import { sys } from "cc";
 import { SdkManager } from "../dy/DyManager";
 import { KsManager } from "../ks/KsManager";
+import { TapManager } from "../tap/TapManager";
+import { DSPlatform } from "../framework/DSPlatform";
 import { App } from "../framework/DSAppManager";
 
+/**
+ * 广告统一门面
+ * 业务侧只调这里,平台差异全部分发下去:
+ *   抖音 -> SdkManager(tt.*)
+ *   快手 -> KsManager(ks.*)
+ *   Tap  -> TapManager(小游戏 tap.* / APK 原生桥)
+ *   微信 -> 本类内的 wx.* 兜底(本项目未上线)
+ */
 export class Ads {
     //wx3217a33cf9eb6526
     public bannerAdv = null;//banner广告
@@ -20,6 +30,11 @@ export class Ads {
     }
 
     init() {
+        if (DSPlatform.isTap) {
+            console.log('--------------init tap ads-----------------');
+            TapManager.instance.initAds();
+            return;
+        }
         if (KsManager.isKuaishouEnv()) {
             // 快手环境:广告走 ks.* 接口(详见 KsManager)
             console.log('--------------init ks ads-----------------');
@@ -87,6 +102,8 @@ export class Ads {
 
     createVideoAds() {
         //@ts-ignore
+        if (DSPlatform.isTap) return;
+        //@ts-ignore
         if (KsManager.isKuaishouEnv()) return;
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
         console.log('--------------init ads-----------------');
@@ -105,6 +122,11 @@ export class Ads {
 
     /** 显示格子广告 */
     showCoustomAd() {
+        if (DSPlatform.isTap) {
+            // Tap 小游戏有原生模板广告(对应格子/模板位),APK 本版不接信息流
+            TapManager.instance.showNativeAds();
+            return;
+        }
         if (KsManager.isKuaishouEnv()) {
             // 快手暂不支持原生模板/格子广告
             console.log('[Ads] 快手平台不支持格子广告');
@@ -117,6 +139,10 @@ export class Ads {
 
     /** 隐藏格子广告 */
     hideCoustomAd() {
+        if (DSPlatform.isTap) {
+            TapManager.instance.hideNativeAds();
+            return;
+        }
         if (KsManager.isKuaishouEnv()) return;
         this.customAd && this.customAd.hide();
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
@@ -124,6 +150,10 @@ export class Ads {
 
     //显示banner广告
     showBannerAds() {
+        if (DSPlatform.isTap) {
+            TapManager.instance.showBannerAds();
+            return;
+        }
         if (KsManager.isKuaishouEnv()) {
             KsManager.instance.showBannerAds();
             return;
@@ -137,6 +167,10 @@ export class Ads {
 
     // 隐藏banner广告
     hideBannerAds() {
+        if (DSPlatform.isTap) {
+            TapManager.instance.hideBannerAds();
+            return;
+        }
         if (KsManager.isKuaishouEnv()) {
             KsManager.instance.hideBannerAds();
             return;
@@ -148,6 +182,11 @@ export class Ads {
 
     //显示视频广告
     showVideoAds(success:Function, fail?:Function) {
+        if (DSPlatform.isTap) {
+            // 注意:激励视频必须玩家主动触发,禁止在这里做自动弹窗
+            TapManager.instance.showVideoAds(success, fail);
+            return;
+        }
         if(sys.platform == sys.Platform.MOBILE_BROWSER || sys.platform == sys.Platform.DESKTOP_BROWSER){
             success && success();
             return;
@@ -202,6 +241,10 @@ export class Ads {
 
     // 显示插件广告
     showInterstitialAds() {
+        if (DSPlatform.isTap) {
+            TapManager.instance.showInterstitialAds();
+            return;
+        }
         if (KsManager.isKuaishouEnv()) {
             KsManager.instance.showInterstitialAds();
             return;
@@ -227,11 +270,16 @@ export class Ads {
      * 其他平台不展示。
      */
     showStartupInterstitial() {
+        if (DSPlatform.isTap) {
+            // Tap:APK 走开屏,小游戏无开屏能力,降级为一次插屏(每次冷启动一次)
+            TapManager.instance.showStartupAds();
+            return;
+        }
         if (KsManager.isKuaishouEnv()) {
             KsManager.instance.showStartupInterstitial();
             return;
         }
-        // 非快手平台不展示
+        // 非快手/Tap 平台不展示
     }
 }
 

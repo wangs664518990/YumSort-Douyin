@@ -5,6 +5,8 @@ import { _decorator, sys } from 'cc';
 import { App } from '../framework/DSAppManager';
 import { DSStorageKey } from '../framework/DSStorageManager';
 import { KsManager } from '../ks/KsManager';
+import { TapManager } from '../tap/TapManager';
+import { DSPlatform } from '../framework/DSPlatform';
 export var IsGetInfo = false;
 export class WxManager {
     private wxCode = '';
@@ -16,6 +18,13 @@ export class WxManager {
      * 登录接口
      */
     _wxLogin() {
+        // Tap 渠道:小游戏用 tap.login,APK 用 TapSDK,都不走微信登录链路
+        if (DSPlatform.isTap) {
+            TapManager.instance.login()
+                .then((res) => console.log('[TapManager] 登录完成', res))
+                .catch((err) => console.log('[TapManager] 登录失败', err));
+            return;
+        }
         // 快手环境(sys.platform 仍为 WECHAT_GAME,但无微信登录链路)不走微信登录
         if (KsManager.isKuaishouEnv()) return;
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
@@ -233,6 +242,11 @@ export class WxManager {
     }
 
     public ShareToOthers(lv: number) {
+        if (DSPlatform.isTap) {
+            // Tap 渠道分享走平台接口,不做分享得奖励(平台禁止诱导分享)
+            TapManager.instance.share(`我已闯过${lv}关,邀您来挑战`);
+            return;
+        }
         if (sys.platform == sys.Platform.WECHAT_GAME) {
             // @ts-ignore
             let tempFilePath = canvas.toTempFilePathSync({
@@ -281,6 +295,11 @@ export class WxManager {
     public vibrate(isLong: boolean = true) {
         let bool = App.storage.getBoolean(DSStorageKey.Zhen_Dong_Status,true);
         if (!bool) return;
+        if (DSPlatform.isTap) {
+            // Tap 小游戏走 tap.vibrate*,APK 走原生桥
+            TapManager.instance.vibrate(isLong);
+            return;
+        }
         if (KsManager.isKuaishouEnv()) {
             // 快手环境使用 ks.vibrateShort/vibrateLong
             KsManager.instance.vibrate(isLong);
@@ -327,6 +346,8 @@ export class WxManager {
     private gamequan: null;
     /** 创建游戏圈 */
     showGameQuan() {
+        // Tap 渠道没有微信游戏圈
+        if (DSPlatform.isTap) return;
         // 快手环境无微信游戏圈
         if (KsManager.isKuaishouEnv()) return;
         if (sys.platform != sys.Platform.WECHAT_GAME) {

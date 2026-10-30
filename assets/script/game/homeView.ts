@@ -7,6 +7,8 @@ import { App } from '../framework/DSAppManager';
 import { DSViewName } from '../framework/DSUiManager';
 import { SdkManager } from '../dy/DyManager';
 import { KsManager } from '../ks/KsManager';
+import { DSPlatform } from '../framework/DSPlatform';
+import { TapAntiAddiction } from '../tap/TapAntiAddiction';
 import { DSEventKey } from '../framework/DSEventManager';
 
 @ccclass('homeView')
@@ -37,7 +39,10 @@ export class homeView extends DSBaseView {
         this.evtUpdateLife();
 
         WxMgr.showGameQuan();
-        if (KsManager.isKuaishouEnv()) {
+        if (DSPlatform.isTap) {
+            // Tap:启动位广告(APK 走开屏,小游戏降级插屏),每次冷启动一次
+            Advertise.showStartupInterstitial();
+        } else if (KsManager.isKuaishouEnv()) {
             // 快手:启动位展示启动插屏(每次冷启动一次),代替普通启动插屏,避免双弹
             Advertise.showStartupInterstitial();
         } else {
@@ -67,7 +72,12 @@ export class homeView extends DSBaseView {
     /** 开始游戏 */
     async onClickstartBtn(){
         App.audio.playEffect("click")
-        
+
+        // Tap 渠道:防沉迷/实名拦截(受限时不进关)
+        if (DSPlatform.isTap && !TapAntiAddiction.guard()) {
+            return;
+        }
+
         let life = App.global.getLife();
         if(life<=0 && !App.global.isTest){
             App.ui.showMsgTips("体力不足");

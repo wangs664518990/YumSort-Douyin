@@ -7,6 +7,7 @@ import { DSTimerManager } from './DSTimerManager';
 import { DSAudioManager } from './DSAudioManager';
 import { DSGlobalFunc } from './DSGlobalFunc';
 import { WxManager, WxMgr } from '../wx/wxManager';
+import { TapAntiAddiction } from '../tap/TapAntiAddiction';
 
 /**
  * DSAppManager - 所有管理器统一入口
@@ -68,6 +69,11 @@ export class DSAppManager {
         this.timer.init();
 
         this._inited = true;
+
+        // Tap 渠道防沉迷/实名(非 Tap 渠道内部直接跳过)
+        // 必须早于任何"开始游戏"入口,否则玩家可能在未校验状态下开局
+        TapAntiAddiction.init();
+
         WxMgr.init();
     }
 

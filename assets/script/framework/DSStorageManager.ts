@@ -14,6 +14,8 @@ export enum DSStorageKey {
     Music_Status = 'Music_Status',
     Life = 'Life',
     CurTimeCount = 'CurTimeCount',
+    /** Tap 渠道防沉迷的玩家标识(匿名 ID,中宣部上报用) */
+    TapUserId = 'TapUserId',
 }
 
 /**

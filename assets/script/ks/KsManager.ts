@@ -19,6 +19,7 @@
  */
 import { sys } from "cc";
 import { App } from "../framework/DSAppManager";
+import { DSPlatform } from "../framework/DSPlatform";
 
 export class KsManager {
     private static _instance: KsManager = null;
@@ -39,6 +40,9 @@ export class KsManager {
      * 注意:若未来上线微信渠道,必须改为全局对象(KSGameGlobal/ks)判断。
      */
     public static isKuaishouEnv(): boolean {
+        // Tap 小游戏同样由"微信小游戏构建"转换而来,运行时也是 WECHAT_GAME,
+        // 必须先排除,否则会误走 ks.* 接口（见 framework/DSPlatform.ts 判定顺序）
+        if (DSPlatform.isTapMini) return false;
         if (sys.platform === sys.Platform.WECHAT_GAME) return true;
         // 非微信构建(如调试环境)下按全局对象兜底
         // @ts-ignore 快手运行时全局对象,编译期无声明
