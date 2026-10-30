@@ -499,13 +499,24 @@ export class TapManager {
                 resolve(null);
                 return;
             }
+            // 官方文档写的是 tap.login(),但不同基础库对"回调式 / Promise 式"支持不一致,
+            // 两种都兼容:传 options 的同时,如果返回值是 Promise 就走 Promise。
+            let settled = false;
+            const done = (ok: boolean, val: any) => {
+                if (settled) return;
+                settled = true;
+                ok ? resolve(val) : reject(val);
+            };
             try {
-                api.login({
-                    success: (res: any) => resolve(res),
-                    fail: (err: any) => reject(err),
+                const ret = api.login({
+                    success: (res: any) => done(true, res),
+                    fail: (err: any) => done(false, err),
                 });
+                if (ret && typeof ret.then === "function") {
+                    ret.then((res: any) => done(true, res)).catch((err: any) => done(false, err));
+                }
             } catch (e) {
-                reject(e);
+                done(false, e);
             }
         });
     }
