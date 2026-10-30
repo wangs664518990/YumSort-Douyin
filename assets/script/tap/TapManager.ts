@@ -478,8 +478,17 @@ export class TapManager {
 
     /**
      * TapTap 登录
-     * 小游戏:官方要求包体内必须已接入 TapTap 登录,否则 TapTap 用户无法正常游玩。
-     * APK:TapSDK TapLogin,原生侧实现后经桥返回 openid / unionid / accessToken。
+     *
+     * 本游戏是单机、无账号体系、无云存档,**不需要玩家"登录"这一功能**。
+     * 但平台硬性要求"包体内必须已正确接入 TapTap 登录",否则 TapTap 用户无法正常游玩,
+     * 所以这里做的是**静默登录**:
+     *   - 启动时调一次 tap.login() 拿临时 code,记录日志后丢弃,不发 UI、不拦流程、不等结果;
+     *   - 失败也不提示玩家(单机游戏没有"登录失败"这种概念);
+     *   - 将来要接云存档 / 排行榜,才需要服务端 code2Session 换 openid,这里预留了返回值。
+     *
+     * 换句话说:"不需要登录" ≠ "不调用登录接口",调用是为了满足平台接入要求,不是为了做账号。
+     *
+     * APK(暂缓):TapSDK TapLogin,原生侧实现后经桥返回 openid / unionid / accessToken。
      */
     public login(): Promise<any> {
         return new Promise((resolve, reject) => {

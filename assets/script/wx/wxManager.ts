@@ -18,11 +18,12 @@ export class WxManager {
      * 登录接口
      */
     _wxLogin() {
-        // Tap 渠道:小游戏用 tap.login,APK 用 TapSDK,都不走微信登录链路
+        // Tap 渠道:本游戏无账号体系,登录只为满足平台"必须接入登录"的要求,
+        // 静默调用、不弹 UI、失败也不拦流程(单机游戏不依赖登录态)
         if (DSPlatform.isTap) {
             TapManager.instance.login()
-                .then((res) => console.log('[TapManager] 登录完成', res))
-                .catch((err) => console.log('[TapManager] 登录失败', err));
+                .then(() => console.log('[Tap] 登录接口已调用(静默,游戏不依赖登录态)'))
+                .catch((err) => console.log('[Tap] 登录接口返回失败(可忽略,单机游戏不依赖登录态)', err));
             return;
         }
         // 快手环境(sys.platform 仍为 WECHAT_GAME,但无微信登录链路)不走微信登录
