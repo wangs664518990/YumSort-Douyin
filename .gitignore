@@ -1,3 +1,8 @@
 ﻿build
 library
 temp
+
+# TapTap 小游戏构建插件(本地安装,自带 node_modules,不入库)
+extensions/taptap-minigame-tools/
+# 插件安装包
+tools/tap-minigame-ts-*.zip
