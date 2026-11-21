@@ -148,7 +148,7 @@ export class Ads {
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
     }
 
-    //显示banner广告
+    //显示banner广告（抖音不接 Banner）
     showBannerAds() {
         if (DSPlatform.isTap) {
             TapManager.instance.showBannerAds();
@@ -158,7 +158,8 @@ export class Ads {
             KsManager.instance.showBannerAds();
             return;
         }
-        SdkManager.instance.initBannerAd();
+        // 抖音：不接 Banner，直接返回
+        if (sys.platform == sys.Platform.BYTEDANCE_MINI_GAME) return;
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
         // 在适合的场景显示 Banner 广告
         // @ts-ignore
@@ -175,6 +176,7 @@ export class Ads {
             KsManager.instance.hideBannerAds();
             return;
         }
+        if (sys.platform == sys.Platform.BYTEDANCE_MINI_GAME) return;
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
         // @ts-ignore
         this.bannerAdv.hide();
@@ -195,8 +197,11 @@ export class Ads {
             KsManager.instance.showVideoAds(success, fail);
             return;
         }
-        SdkManager.instance.initVideoAd();
-        SdkManager.instance.showVideoAd(success);
+        // 抖音：由 SdkManager 统一处理（启动时已预加载实例）
+        if (sys.platform == sys.Platform.BYTEDANCE_MINI_GAME) {
+            SdkManager.instance.showVideoAd(success, fail);
+            return;
+        }
         if (sys.platform != sys.Platform.WECHAT_GAME) {
             return;
         };
@@ -249,8 +254,11 @@ export class Ads {
             KsManager.instance.showInterstitialAds();
             return;
         }
-        SdkManager.instance.initInterstitialAd();
-        SdkManager.instance.showInterstitialAd();
+        // 抖音：由 SdkManager 统一做节流与预加载
+        if (sys.platform == sys.Platform.BYTEDANCE_MINI_GAME) {
+            SdkManager.instance.showInterstitialAd();
+            return;
+        }
         if (sys.platform != sys.Platform.WECHAT_GAME) return;
         let interstitialAd = this.interstitialAd;
         // 在适合的场景显示插屏广告

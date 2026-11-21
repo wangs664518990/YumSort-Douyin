@@ -52,6 +52,15 @@
         "highPerformanceMode": false,
         "__version__": "1.0.4",
         "wasmSubpackage": true
+      },
+      "1793342313570": {
+        "orientation": "portrait",
+        "appid": "wxa4fb383300ff5f5a",
+        "buildOpenDataContextTemplate": true,
+        "separateEngine": false,
+        "highPerformanceMode": false,
+        "__version__": "1.0.4",
+        "wasmSubpackage": true
       }
     },
     "__version__": "1.3.9"

@@ -1,4 +1,4 @@
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, Component, Node, sys } from 'cc';
 import { WxMgr } from '../wx/wxManager';
 import { Advertise } from '../wx/advertise';
 import { DSBaseView } from '../framework/DSBaseView';
@@ -7,6 +7,7 @@ import { DSViewName } from '../framework/DSUiManager';
 import { DSEventKey } from '../framework/DSEventManager';
 import { DSPlatform } from '../framework/DSPlatform';
 import { TapAntiAddiction } from '../tap/TapAntiAddiction';
+import { SdkManager } from '../dy/DyManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('resultView')
@@ -22,6 +23,8 @@ export class resultView extends DSBaseView {
         this.getNodeByPath('animNode/content/lose').active = !isWin;
         if (isWin) {
             App.gameConfig.nextLevel();
+            // 通关后上报分数到抖音排行榜
+            SdkManager.instance.setStarScore();
         }
         this.scheduleOnce(() => {
         if (isWin) {

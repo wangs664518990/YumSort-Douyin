@@ -21,7 +21,8 @@
           "gfx-webgl2": "off"
         }
       },
-      "wasmCompressionMode": "brotli"
+      "wasmCompressionMode": "brotli",
+      "mangleProperties": true
     },
     "options": {
       "bytedance-mini-game": {
@@ -36,10 +37,10 @@
           "epsilon": 0.001
         },
         "devToolsLaunchMethod": "full",
-        "separateEngine": true,
+        "separateEngine": false,
         "__version__": "1.0.3",
-        "wasmSubpackage": true,
-        "generatePreloadJsFileList": true
+        "wasmSubpackage": false,
+        "generatePreloadJsFileList": false
       }
     },
     "taskOptionsMap": {
@@ -55,10 +56,10 @@
           "epsilon": 0.001
         },
         "devToolsLaunchMethod": "full",
-        "separateEngine": true,
+        "separateEngine": false,
         "__version__": "1.0.3",
-        "wasmSubpackage": true,
-        "generatePreloadJsFileList": true
+        "wasmSubpackage": false,
+        "generatePreloadJsFileList": false
       }
     },
     "__version__": "1.3.9"

@@ -27,7 +27,8 @@
         "gfx-webgl2": "off"
       }
     },
-    "wasmCompressionMode": "brotli"
+    "wasmCompressionMode": "brotli",
+    "mangleProperties": true
   },
   "BuildTaskManager": {
     "taskMap": {
@@ -179,8 +180,8 @@
         "progress": 1,
         "state": "success",
         "stage": "build",
-        "message": "2026-9-24 11:30:16 build success in 10 s!",
-        "detailMessage": "// ---- build task cocos-service：onAfterBuild ----\r",
+        "message": "2026-11-17 19:43:05 build success in 16 s!",
+        "detailMessage": "build task(bytedance-mini-game) in 15860!\r",
         "options": {
           "name": "CCC3.8.8_food_sort_newFrame",
           "server": "",
@@ -189,7 +190,7 @@
           "buildPath": "project://build",
           "debug": false,
           "buildMode": "normal",
-          "mangleProperties": false,
+          "mangleProperties": true,
           "md5Cache": false,
           "skipCompressTexture": false,
           "sourceMaps": false,
@@ -239,9 +240,12 @@
           },
           "packages": {},
           "__version__": "1.3.9",
-          "logDest": "project://temp/builder/log/bytedance-mini-game7-23-2026 14-54.log"
+          "logDest": "project://temp/builder/log/bytedance-mini-game7-23-2026 14-54.log",
+          "__builderUiTaskNavigation": "mwkm22yo-bqbgzsr6alt:6",
+          "__builderUiTaskTime": 1794915769512,
+          "taskId": "1784789683460"
         },
-        "time": "2026-9-24 11:30:06",
+        "time": "2026-11-17 19:42:49",
         "dirty": false
       },
       "1792302540701": {
@@ -622,6 +626,170 @@
           "logDest": "project://temp/builder/log/android2026-10-30 13-16.log"
         },
         "time": "2026-10-30 13:16:13",
+        "dirty": false
+      },
+      "1793342313570": {
+        "type": "build",
+        "id": "1793342313570",
+        "progress": 1,
+        "state": "success",
+        "stage": "build",
+        "message": "2026-10-30 14:39:49 build success in 1 min 15 s!",
+        "detailMessage": "build task(wechatgame) in 75418!\r",
+        "options": {
+          "name": "CCC3.8.8_food_sort_newFrame",
+          "server": "",
+          "engineModulesConfigKey": "defaultConfig",
+          "platform": "wechatgame",
+          "buildPath": "project://build",
+          "debug": false,
+          "buildMode": "normal",
+          "mangleProperties": false,
+          "md5Cache": false,
+          "skipCompressTexture": false,
+          "sourceMaps": false,
+          "overwriteProjectSettings": {
+            "macroConfig": {
+              "cleanupImageCache": "on"
+            },
+            "includeModules": {
+              "physics": "inherit-project-setting",
+              "physics-2d": "inherit-project-setting",
+              "gfx-webgl2": "off"
+            }
+          },
+          "nativeCodeBundleMode": "asmjs",
+          "polyfills": {
+            "asyncFunctions": false
+          },
+          "experimentalEraseModules": false,
+          "startSceneAssetBundle": true,
+          "bundleConfigs": [],
+          "inlineEnum": true,
+          "useBuiltinServer": false,
+          "md5CacheOptions": {
+            "excludes": [],
+            "includes": [],
+            "replaceOnly": [],
+            "handleTemplateMd5Link": true
+          },
+          "mainBundleIsRemote": false,
+          "mainBundleCompressionType": "subpackage",
+          "useSplashScreen": true,
+          "bundleCommonChunk": false,
+          "packAutoAtlas": true,
+          "startScene": "5707c3c2-5bee-458e-b287-a8b13ade06c9",
+          "outputName": "wechatgame-wechatgame",
+          "taskName": "wechatgame",
+          "scenes": [
+            {
+              "url": "db://assets/scene/game.scene",
+              "uuid": "5707c3c2-5bee-458e-b287-a8b13ade06c9"
+            }
+          ],
+          "wasmCompressionMode": false,
+          "binGroupConfig": {
+            "threshold": 16,
+            "enable": false
+          },
+          "packages": {},
+          "__version__": "1.3.9",
+          "__builderUiBuildAllBatchTime": 1793342313566,
+          "__builderUiTaskNavigation": "mvulg0gd-9uqgdx7vzt9:2",
+          "taskId": "1793342313570",
+          "__builderUiTaskTime": 1793342313570,
+          "logDest": "project://temp/builder/log/wechatgame2026-10-30 14-38.log"
+        },
+        "time": "2026-10-30 14:38:33",
+        "dirty": false
+      },
+      "1793342313749": {
+        "type": "build",
+        "id": "1793342313749",
+        "progress": 1,
+        "state": "success",
+        "stage": "build",
+        "message": "2026-10-30 14:40:51 build success in 1 min 1 s!",
+        "detailMessage": "Asset DB is resume!\r",
+        "options": {
+          "name": "CCC3.8.8_food_sort_newFrame",
+          "server": "",
+          "engineModulesConfigKey": "defaultConfig",
+          "platform": "openpaas",
+          "buildPath": "project://build",
+          "debug": false,
+          "buildMode": "normal",
+          "mangleProperties": false,
+          "md5Cache": false,
+          "skipCompressTexture": false,
+          "sourceMaps": false,
+          "overwriteProjectSettings": {
+            "macroConfig": {
+              "cleanupImageCache": "inherit-project-setting"
+            },
+            "includeModules": {
+              "physics": "inherit-project-setting",
+              "physics-2d": "inherit-project-setting",
+              "gfx-webgl2": "off"
+            }
+          },
+          "nativeCodeBundleMode": "asmjs",
+          "polyfills": {
+            "asyncFunctions": false
+          },
+          "experimentalEraseModules": false,
+          "startSceneAssetBundle": false,
+          "bundleConfigs": [],
+          "inlineEnum": true,
+          "useBuiltinServer": false,
+          "md5CacheOptions": {
+            "excludes": [],
+            "includes": [],
+            "replaceOnly": [],
+            "handleTemplateMd5Link": true
+          },
+          "mainBundleIsRemote": false,
+          "mainBundleCompressionType": "merge_dep",
+          "useSplashScreen": true,
+          "bundleCommonChunk": false,
+          "packAutoAtlas": true,
+          "startScene": "5707c3c2-5bee-458e-b287-a8b13ade06c9",
+          "outputName": "openpaas-002",
+          "taskName": "openpaas-002",
+          "scenes": [
+            {
+              "url": "db://assets/scene/game.scene",
+              "uuid": "5707c3c2-5bee-458e-b287-a8b13ade06c9"
+            }
+          ],
+          "wasmCompressionMode": false,
+          "binGroupConfig": {
+            "threshold": 16,
+            "enable": false
+          },
+          "packages": {},
+          "__version__": "1.3.9",
+          "__builderUiAutoLinkedBuild": true,
+          "__builderUiBuildAllBatchTime": 1793342313566,
+          "buildStageGroup": {
+            "debug": []
+          },
+          "builderUiPublishAfterBuild": false,
+          "__builderUiTaskNavigation": "mvulg0gd-9uqgdx7vzt9:2",
+          "taskId": "1793342313749",
+          "__builderUiTaskTime": 1793342313749,
+          "logDest": "project://temp/builder/log/openpaas2026-10-30 14-38.log",
+          "platformData": {
+            "openpaas": {
+              "schemaVersion": 1,
+              "gameId": "2111696122300706818",
+              "packageId": "2116057721730969602",
+              "version": "0.0.1",
+              "codeVersion": "3"
+            }
+          }
+        },
+        "time": "2026-10-30 14:39:50",
         "dirty": false
       }
     }

@@ -49,7 +49,6 @@ export class homeView extends DSBaseView {
             // 其他平台维持原启动插屏
             Advertise.showInterstitialAds();
         }
-        Advertise.showBannerAds();
         Advertise.showCoustomAd();
         SdkManager.instance.showCustomAdsOne();
         SdkManager.instance.showCustomAdsFour();
@@ -103,7 +102,8 @@ export class homeView extends DSBaseView {
     onClickrankBtn(){
         App.audio.playEffect("click")
         if (sys.platform == sys.Platform.BYTEDANCE_MINI_GAME) {
-            SdkManager.instance.getByteRankData(()=>{});
+            // 抖音：getByteRankData 内部会先上报当前分数再拉起排行榜面板
+            SdkManager.instance.getByteRankData();
         }else{
             App.ui.openView(DSViewName.rankView);
         }

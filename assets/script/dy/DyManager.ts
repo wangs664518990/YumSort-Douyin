@@ -2,6 +2,15 @@ import { BYTEDANCE, WECHAT } from "cc/env";
 import { sys } from "cc";
 import { App } from "../framework/DSAppManager";
 
+/** 抖音广告位集中配置 */
+const DY_AD_CONFIG = {
+    rewardedVideoId: '1533aeej4hkk6a8jh5',
+    interstitialId: '44d5a8ll12km6brkeb',
+};
+
+/** 插屏最小间隔（毫秒），避免短局快速结算时频繁弹出 */
+const INTERSTITIAL_MIN_INTERVAL = 90 * 1000;
+
 export class SdkManager {
     public static _instance: SdkManager = null
 
@@ -13,14 +22,15 @@ export class SdkManager {
     }
 
     // 激励视频
-    videoId: string = '1533aeej4hkk6a8jh5'
-    private videoAd = null
+    private videoAd: any = null
+    private videoCloseHandler: any = null
+    /** 幂等保护：同一次 show 的 onClose 只结算一次 */
+    private videoSettled: boolean = false
+
     // 插屏
-    interstitialId: string = '44d5a8ll12km6brkeb'
-    private interstitialAd = null
-    // 横幅
-    bannerId: string = ''
-    private bannerAd = null
+    private interstitialAd: any = null
+    /** 上次插屏展示时间戳 */
+    private lastInterstitialTime: number = 0
 
     // 获取平台
     getPlatform() {
@@ -33,164 +43,175 @@ export class SdkManager {
         return platform
     }
 
-    // 初始化横幅
-    initBannerAd() {
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME) {
-            return
-        }
+    /** 是否抖音小游戏环境 */
+    private isDouyin(): boolean {
+        return sys.platform == sys.Platform.BYTEDANCE_MINI_GAME
+    }
+
+    // ==================== 启动初始化 ====================
+
+    /**
+     * 启动时预创建激励视频 / 插屏实例并预加载。
+     * 应在 App.init() 之后、首页加载之前调用。
+     */
+    public init() {
+        if (!this.isDouyin()) return
+        this.initVideoAd()
+        this.initInterstitialAd()
+    }
+
+    // ==================== 激励视频 ====================
+
+    /** 初始化激励视频实例 */
+    initVideoAd() {
+        if (!this.isDouyin()) return
         const platform = this.getPlatform()
         if (!platform) {
-            console.log('banner ad init...')
+            console.log('[DY-Ad] video ad init: platform not ready')
             return
         }
-        if (this.bannerId == '') {
-            return
-        }
-        let winSize = platform.getSystemInfoSync();
-        if (this.bannerAd == null) {
-            this.bannerAd = platform.createBannerAd({
-                adUnitId: this.bannerId,
-                adIntervals: 30,
-                style: {
-                    height: winSize.windowHeight - 80,
-                    left: 0,
-                    top: 500,
-                    width: winSize.windowWidth
-                }
+        if (this.videoAd == null) {
+            this.videoAd = platform.createRewardedVideoAd({
+                adUnitId: DY_AD_CONFIG.rewardedVideoId
             });
-            this.bannerAd.onResize((res: any) => {
-                this.bannerAd.style.top = winSize.windowHeight - this.bannerAd.style.realHeight;
-                this.bannerAd.style.left = winSize.windowWidth / 2 - this.bannerAd.style.realWidth / 2;
+            this.videoAd.onError((err: any) => {
+                console.warn('[DY-Ad] 激励视频错误', JSON.stringify(err))
             });
-            this.bannerAd.onError((err: any) => {
-                console.log('初始化异常', err)
+            // 预加载
+            this.videoAd.load().then(() => {
+                console.log('[DY-Ad] 激励视频预加载完成')
+            }).catch((err: any) => {
+                console.warn('[DY-Ad] 激励视频预加载失败', JSON.stringify(err))
             });
         }
     }
 
-    // 横幅展示
-    toggleBannerAd(isShow: boolean) {
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME) {
+    /** 显示激励视频 */
+    showVideoAd(success: Function, fail?: Function) {
+        if (!this.isDouyin()) {
             return
+        }
+        if (!this.videoAd) {
+            this.initVideoAd();
         }
         const platform = this.getPlatform()
         if (!platform) {
-            console.log(`【流量主横幅:${isShow}】`)
+            console.warn('[DY-Ad] platform not ready')
+            fail && fail('广告暂不可用')
             return
         }
-        if (this.bannerAd) {
-            isShow ? this.bannerAd.show() : this.bannerAd.hide();
+        if (!this.videoAd) {
+            fail && fail('广告暂不可用')
+            App.ui.showMsgTips('广告加载中，请稍后再试')
+            return
         }
+
+        // 重置幂等标志
+        this.videoSettled = false
+
+        // 先移除上一次的 onClose handler
+        this.removeVideoCloseHandler()
+
+        App.global.isShowVideoAds = true;
+
+        // 注册 onClose
+        const handler = (res: any) => {
+            if (this.videoSettled) return
+            this.videoSettled = true
+
+            App.global.isShowVideoAds = false;
+            this.removeVideoCloseHandler();
+
+            if (res && res.isEnded || res === undefined) {
+                success && success('激励奖励已发放')
+            } else {
+                fail && fail('视频播放中断')
+                App.ui.showMsgTips('视频未播完，奖励未发放')
+            }
+        };
+        this.videoCloseHandler = handler;
+        this.videoAd.onClose(handler);
+
+        // 展示，失败则重试一次
+        this.videoAd.show().catch(() => {
+            this.videoAd.load()
+                .then(() => this.videoAd.show())
+                .catch((err: any) => {
+                    console.warn('[DY-Ad] 激励视频展示失败', JSON.stringify(err))
+                    this.videoSettled = true
+                    this.removeVideoCloseHandler()
+                    App.global.isShowVideoAds = false
+                    fail && fail('广告展示失败')
+                    App.ui.showMsgTips('广告加载失败，请稍后再试')
+                })
+        });
     }
 
-    // 初始化插屏
+    /** 显式移除当前 onClose handler */
+    private removeVideoCloseHandler() {
+        if (this.videoAd && this.videoCloseHandler) {
+            try {
+                this.videoAd.offClose(this.videoCloseHandler)
+            } catch (e) {
+                console.warn('[DY-Ad] offClose 异常', e)
+            }
+        }
+        this.videoCloseHandler = null
+    }
+
+    // ==================== 插屏 ====================
+
+    /** 初始化插屏实例 */
     initInterstitialAd() {
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME) {
-            return
-        }
+        if (!this.isDouyin()) return
         const platform = this.getPlatform()
         if (!platform) {
-            console.log('inter ad init...')
-            return
-        }
-        if (this.interstitialId == '') {
+            console.log('[DY-Ad] interstitial ad init: platform not ready')
             return
         }
         if (this.interstitialAd == null) {
             this.interstitialAd = platform.createInterstitialAd({
-                adUnitId: this.interstitialId
+                adUnitId: DY_AD_CONFIG.interstitialId
             });
             this.interstitialAd.onError((err: any) => {
+                console.warn('[DY-Ad] 插屏错误', JSON.stringify(err))
             });
         }
     }
 
-    // 插屏展示
+    /** 显示插屏（带节流） */
     showInterstitialAd() {
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME) {
+        if (!this.isDouyin()) return
+
+        // 节流：距上次展示不足间隔则跳过
+        const now = Date.now()
+        if (now - this.lastInterstitialTime < INTERSTITIAL_MIN_INTERVAL) {
             return
         }
-        if(!this.interstitialAd){
+
+        if (!this.interstitialAd) {
             this.initInterstitialAd();
         }
 
         const platform = this.getPlatform()
         if (!platform) {
-            console.log('【流量主插屏】')
             return
         }
         if (this.interstitialAd) {
             this.interstitialAd.show().catch((err: any) => {
+                console.warn('[DY-Ad] 插屏展示失败', JSON.stringify(err))
+                // 展示失败时重置时间窗口，避免节流误伤下次正常调用
+                this.lastInterstitialTime = 0
             });
+            this.lastInterstitialTime = now
         }
     }
 
-    // 初始化激励
-    initVideoAd() {
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME) {
-            return
-        }
-        const platform = this.getPlatform()
-        if (!platform) {
-            console.log('video ad init...')
-            return
-        }
-        if (this.videoId == '') {
-            return
-        }
-        if (this.videoAd == null) {
-            this.videoAd = platform.createRewardedVideoAd({
-                adUnitId: this.videoId
-            });
-            this.videoAd.onError((err: any) => {
-            });
-        }
-    }
-
-    // 激励展示
-    showVideoAd(success: any, fail?: any) {
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME) {
-            // success && success()
-            return
-        }
-        if(!this.videoAd){
-            this.initVideoAd();
-        }
-        const platform = this.getPlatform()
-        if (!platform) {
-            console.log('激励模拟成功')
-            return success && success('模拟成功，激励奖励已发放')
-        }
-        if (this.videoAd) {
-            App.global.isShowVideoAds = true;
-            this.videoAd.offClose();
-            this.videoAd.onClose((res: any) => {
-                App.global.isShowVideoAds = false;
-                this.videoAd.offClose();
-                if (res && res.isEnded || res === undefined) {
-                    // GlobalFuncHelper.addReward();
-                    return success && success('激励奖励已发放')
-                } else {
-                    return fail && fail('视频播放中断')
-                }
-            });
-            this.videoAd.show().catch(() => {
-                this.videoAd.load()
-                    .then(() => this.videoAd.show())
-                    .catch((err: any) => {
-                        console.log('广告展示失败')
-                    })
-            });
-        } else {
-            // console.log('激励模拟成功')
-            return fail && fail('该功能尚未开放')
-        }
-    }
-
+    // ==================== 分享 ====================
 
     /** 分享 */
     openShare() {
-        if (sys.platform == sys.Platform.BYTEDANCE_MINI_GAME) {
+        if (this.isDouyin()) {
             // @ts-ignore
             tt.shareAppMessage({
                 templateId: "3blkgea02ne0ib4f72", // 替换成通过审核的分享ID
@@ -204,6 +225,8 @@ export class SdkManager {
             });
         }
     }
+
+    // ==================== 巨量引擎转化上报 ====================
 
     /**
      * reportGdtEvent 简易版
@@ -227,7 +250,7 @@ export class SdkManager {
         data: {
             event_type: eventType,
             context: { ad: { callback: clickid } },
-            timestamp: Date.now(), // 使用当前时间即可
+            timestamp: Math.floor(Date.now() / 1000), // 秒级时间戳
         },
         success(res) {
             console.log("reportGdtEvent: 上报成功", eventType, res.data);
@@ -240,73 +263,82 @@ export class SdkManager {
         });
     }
 
-    /** 设置指定等级的星数 */
+    // ==================== 排行榜 ====================
+
+    /**
+     * 上报当前关卡分数到抖音 IM 排行榜。
+     * 应在通关（resultView initParams isWin）时调用，确保排行榜数据是最新的。
+     */
     setStarScore() {
-        let cur = App.gameConfig.getCurLevel();
-        let score = cur;
-        if (sys.platform == sys.Platform.BYTEDANCE_MINI_GAME) {
-            // @ts-ignore
-            tt.setImRankData({
-                dataType: 0, //成绩为数字类型
-                value: score + "", //该用户得了999999分
-                priority: 0, //dataType为数字类型，不需要权重，直接传0
-                extra: "extra",
-                zoneId: 'default',
-                success(res) {
-                    console.log(`setImRankData success res: ${res}`);
-                    console.log(JSON.stringify(res));
-                },
-                fail(res) {
-                    console.log(`setImRankData fail res: ${res.errMsg}`);
-                },
-            });
-        }
+        if (!this.isDouyin()) return;
+        let curLevel = App.gameConfig.getCurLevel();
+        // value 必须是字符串；用关卡数作为分数，关卡越高排名越靠前
+        let value = String(curLevel);
+        // @ts-ignore
+        tt.setImRankData({
+            dataType: 0, // 0 = 数字类型
+            value: value,
+            priority: 0, // 数字类型不需要权重
+            extra: "extra",
+            zoneId: 'default',
+            success(res: any) {
+                console.log('[DY-Rank] setImRankData success', JSON.stringify(res));
+            },
+            fail(res: any) {
+                console.warn('[DY-Rank] setImRankData fail', res.errMsg);
+            },
+        });
     }
 
-    getByteRankData(cb: Function) {
-        if (sys.platform == sys.Platform.BYTEDANCE_MINI_GAME) {
-            //moba游戏自动生成段位榜
-            // @ts-ignore
-            tt.getImRankList({
-                relationType: "default", //好友榜、总榜都展示
-                dataType: 0, //只圈选type为枚举类型的数据进行排序
-                rankType: "week", //每天凌晨0点更新，只对当天0点到现在写入的数据进行排序
-                suffix: "", //为空或不填，一般枚举类型不需要填后缀
-                rankTitle: "排行榜", //标题
-                zoneId: 'default',
-                success(res) {
-                    console.log(`getImRankData success res: ${res}`);
-                    console.log(JSON.stringify(res));
-                },
-                fail(res) {
-                    console.log(`getImRankData fail res: ${res.errMsg}`);
-                },
-            });
-        }
-        else{
+    /**
+     * 拉起抖音排行榜面板。
+     * 先上报当前分数，再展示排行榜，确保玩家最新成绩出现在榜上。
+     * @param cb 排行榜关闭后的回调（可选）
+     */
+    getByteRankData(cb?: Function) {
+        if (!this.isDouyin()) {
             App.ui.showMsgTips("该功能在抖音小程序上可见");
+            return;
         }
+        // 先上报当前分数，再拉排行榜
+        this.setStarScore();
+        // @ts-ignore
+        tt.getImRankList({
+            relationType: "default", // 好友榜 + 总榜都展示
+            dataType: 0, // 0 = 数字类型，与 setImRankData 的 dataType 一致
+            rankType: "week", // 按周排序
+            suffix: "",
+            rankTitle: "排行榜",
+            zoneId: 'default',
+            success(res: any) {
+                console.log('[DY-Rank] getImRankList success', JSON.stringify(res));
+                if (cb) cb(res);
+            },
+            fail(res: any) {
+                console.warn('[DY-Rank] getImRankList fail', res.errMsg);
+                App.ui.showMsgTips("排行榜暂不可用，请稍后再试");
+            },
+        });
     }
+
+    // ==================== 格子广告 ====================
 
     //GridSizeType = "medium" | "small" | "large";
     //GridCountType = "one" | "four" | "nine";
     /** 四宫格 banner*/
     private customAdsFour: any = null;
     showCustomAdsFour(){
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME)return;
+        if (!this.isDouyin()) return;
         //@ts-ignore
         this.customAdsFour = tt.createGridGamePanel({
             gridCount: "four",
             size: "large",
-            // query: {
-            //     tt51f42749cef9b2bb02: "age=8&name=往昔寻差异",
-            // },
         });
         this.customAdsFour.show();
     }
 
     hideCustomAdsFour(){
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME)return;
+        if (!this.isDouyin()) return;
         if(!this.customAdsFour)return;
         //@ts-ignore
         this.customAdsFour.hide();
@@ -314,20 +346,17 @@ export class SdkManager {
     /** 更多游戏 */
     private customAdsNine: any = null;
     showCustomAdsNine(){
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME)return;
+        if (!this.isDouyin()) return;
         //@ts-ignore
         this.customAdsNine = tt.createGridGamePanel({
             gridCount: "nine",
             size: "medium",
-            // query: {
-            //     tt51f42749cef9b2bb02: "age=8&name=往昔寻差异",
-            // },
         });
         this.customAdsNine.show();
     }
 
     hideCustomAdsNine(){
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME)return;
+        if (!this.isDouyin()) return;
         if(!this.customAdsNine)return;
         //@ts-ignore
         this.customAdsNine.hide();
@@ -336,14 +365,11 @@ export class SdkManager {
     /** 单格 banner*/
     private customAdsOne: any = null;
     showCustomAdsOne(){
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME)return;
+        if (!this.isDouyin()) return;
         //@ts-ignore
         this.customAdsOne = tt.createGridGamePanel({
             gridCount: "one",
             size: "small",
-            query: {
-                tt51f42749cef9b2bb02: "age=8&name=往昔寻差异",
-            },
             position: {
                 top: 90,
                 left: 280,
@@ -353,18 +379,20 @@ export class SdkManager {
     }
 
     hideCustomAdsOne(){
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME)return;
+        if (!this.isDouyin()) return;
         if(!this.customAdsOne)return;
         //@ts-ignore
         this.customAdsOne.hide();
     }
+
+    // ==================== 登录 ====================
 
     /**
      * 执行登录操作
      * @returns Promise<void>
      */
     async performLogin() {
-        if (sys.platform != sys.Platform.BYTEDANCE_MINI_GAME)return;
+        if (!this.isDouyin()) return;
         console.log('执行登录操作:');
         await this.login();
     }

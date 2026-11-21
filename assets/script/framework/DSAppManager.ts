@@ -8,6 +8,7 @@ import { DSAudioManager } from './DSAudioManager';
 import { DSGlobalFunc } from './DSGlobalFunc';
 import { WxManager, WxMgr } from '../wx/wxManager';
 import { TapAntiAddiction } from '../tap/TapAntiAddiction';
+import { SdkManager } from '../dy/DyManager';
 
 /**
  * DSAppManager - 所有管理器统一入口
@@ -73,6 +74,9 @@ export class DSAppManager {
         // Tap 渠道防沉迷/实名(非 Tap 渠道内部直接跳过)
         // 必须早于任何"开始游戏"入口,否则玩家可能在未校验状态下开局
         TapAntiAddiction.init();
+
+        // 抖音：启动时预创建激励视频 / 插屏实例并预加载
+        SdkManager.instance.init();
 
         WxMgr.init();
     }

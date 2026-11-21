@@ -25,7 +25,6 @@ export class settingView extends DSBaseView {
         this.getNodeByPath('bg/top/btn/btnVibration/off').active = !App.storage.getBoolean(DSStorageKey.Zhen_Dong_Status,true);
     }
     initParams() {
-        Advertise.showBannerAds();
         this.getNodeByPath("bg/btn").active = !!App.ui.getView(DSViewName.gameView);
     }
 

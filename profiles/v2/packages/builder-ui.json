@@ -3,7 +3,7 @@
   "panelCategory": "native",
   "panelView": "history",
   "panelNavigation": {
-    "category": "native",
-    "view": "home"
+    "category": "game",
+    "view": "history"
   }
 }
